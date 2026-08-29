@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ระบบขายแซนวิช</title>
+  <style>
+    body {
+      font-family: "Prompt", Arial, sans-serif;
+      background-color: #000000b9;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      color: #ffffff;
+      border-top: 3px solid #fbff00;
+      padding-top: 5px;
+      padding-bottom: 10px;
+    }
+
+    h4 {
+      margin: 5px;
+    }
+
+    button {
+      background-color: #00c006;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049b7;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      /* จัดให้อยู่กึ่งกลาง */
+      gap: 20px;
+      /* กำหนดระยะห่างระหว่างปุ่ม */
+      margin-top: 20px;
+      /* กำหนดระยะห่างจากด้านบน */
+    }
+
+    .toggle-btn {
+      background-color: #000000;
+      color: white;
+      border: none;
+      margin: 0px;
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background-color: #000000;
+    }
+
+    .toggle-btn:active {
+      transform: scale(0.95);
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: calc(50% - 10px);
+      padding: 10px;
+      margin: 5px 5px 20px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 600px) {
+
+      input[type="number"],
+      input[type="text"] {
+        width: 100%;
+        margin: 5px 0;
+      }
+    }
+
+    table {
+      color: #000000;
+      width: 100%;
+      border: 0px solid #ffffff;
+      margin-top: 1px;
+    }
+
+    th,
+    td {
+      border: 1px solid #000000;
+      border-radius: 5px;
+      padding: 1px;
+      text-align: center;
+    }
+
+
+    th {
+      background-color: #000000;
+      color: #ff0000;
+      border: 1px solid #ffffff;
+      text-align: center;
+    }
+
+    #clearPopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      width: 80%;
+      max-width: 400px;
+      max-height: 80vh;
+      /* ความสูงสูงสุดของป๊อปอัป */
+      overflow-y: auto;
+      /* เพิ่มแถบเลื่อน */
+      box-sizing: border-box;
+      /* จัดการ padding และ width อย่างถูกต้อง */
+    }
+
+    #itemList {
+      max-height: 60vh;
+      /* กำหนดความสูงสูงสุดสำหรับรายการ */
+      overflow-y: auto;
+      /* เพิ่มแถบเลื่อนสำหรับรายการ */
+      margin-top: 10px;
+      padding: 0;
+      list-style: none;
+      /* เอาหมายเลขรายการออก */
+    }
+
+    #customItems,
+    #results {
+      background-color: #ffe9e9a8;
+      color: #000000;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgb(255, 255, 255);
+      margin-top: 20px;
+    }
+
+    /* ปุ่ม "ไปยังหน้าถัดไป" */
+    #joe {
+      display: inline-block;
+      text-decoration: none;
+      background-color: #6f42c1;
+      /* สีม่วง */
+      color: white;
+      padding: 10px 20px;
+      border-radius: 16px;
+      font-size: 16px;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #joe:hover {
+      background-color: #5a3794;
+      /* สีม่วงเข้ม */
+    }
+
+    #joe:active {
+      transform: scale(0.95);
+    }
+
+    #saveImageBtn {
+      display: inline-block;
+      text-decoration: none;
+      background-color: #000000;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 16px;
+      font-size: 16px;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #saveImageBtn:hover {
+      background-color: #000000af;
+    }
+
+    #saveImageBtn:active {
+      transform: scale(0.95);
+    }
+
+    #faa {
+      display: inline-block;
+      text-decoration: none;
+      background-color: #9c0000;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 16px;
+      font-size: 16px;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #faa :hover {
+      background-color: #9c000075;
+      /* สีม่วงเข้ม */
+    }
+
+    #faa :active {
+      transform: scale(0.95);
+    }
+
+    #customItems {
+      max-height: 400px;
+      /* กำหนดความสูงสูงสุด */
+      overflow-y: auto;
+      /* ทำให้สามารถเลื่อนขึ้น-ลงได้ */
+      margin-top: 20px;
+    }
+
+    .custom-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      /* จัดเรียงให้มี 3 คอลัมน์ */
+      gap: 10px;
+      /* ระยะห่างระหว่างช่อง */
+      background-color: #f0f0f0;
+      /* สีพื้นหลัง */
+      padding: 10px;
+      /* ระยะห่างในแต่ละช่อง */
+      border-radius: 8px;
+      /* มุมโค้ง */
+      margin-bottom: 10px;
+      /* ระยะห่างระหว่างรายการ */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      /* เงาเล็กน้อย */
+    }
+
+    .custom-item input {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 90%;
+      /* ให้ช่องกรอกข้อมูลมีความกว้างเต็ม */
+    }
+
+    .custom-item input[type="text"] {
+      flex-grow: 2;
+      /* ให้ช่องชื่อรายการมีขนาดใหญ่กว่า */
+    }
+
+    .custom-item label {
+      font-weight: bold;
+      margin-right: 1px;
+    }
+
+    .custom-item .item-name .custom-item .item-qty,
+    .custom-item .item-price {
+      text-align: center;
+      padding: 0px;
+    }
+
+    .item-image-name {
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 90%;
+      margin-right: 150px;
+    }
+
+    .date-header {
+      font-size: 15px;
+      font-weight: bold;
+      color: #ff0000;
+      text-align: center;
+      margin-bottom: 10px;
+      background-color: #000000;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      /* จัดให้อยู่กึ่งกลาง */
+      gap: 15px;
+      /* เว้นระยะห่างระหว่างปุ่ม */
+      margin-top: 20px;
+      /* เพิ่มระยะห่างด้านบน */
+    }
+
+    .action-btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      font-weight: bold;
+    }
+
+    .delete-btn {
+      background-color: #dc3545;
+      /* สีแดง */
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+
+    .delete-btn:active {
+      transform: scale(0.95);
+    }
+
+    .close-btn {
+      background-color: #000000;
+      /* สีเทา */
+      color: white;
+    }
+
+    .close-btn:hover {
+      background-color: #0000009a;
+    }
+
+    .close-btn:active {
+      transform: scale(0.95);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
+      authDomain: "jojutjan.firebaseapp.com",
+      projectId: "jojutjan",
+      storageBucket: "jojutjan.firebasestorage.app",
+      messagingSenderId: "1010237466401",
+      appId: "1:1010237466401:web:88855a3237647f1718c060",
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+</head>
+
+<body>
+  <h2>รายการสินค้า</h2>
+  <div id="customItems"></div>
+  <div class="button-container">
+    <button type="button" onclick="addNewItem()">เพิ่มรายการใหม่</button>
+    <button id="joe" type="button" onclick="saveData()">บันทึกข้อมูล</button>
+  </div>
+
+  <h2>ยอดรวมทั้งหมด</h2>
+  <div id="results"></div>
+  <div class="button-container">
+    <button id="faa" type="button" onclick="showClearPopup()">เคลียร์ข้อมูล</button>
+    <button id="saveImageBtn">บันทึกรูปภาพผลลัพธ์</button>
+  </div>
+
+
+  <div id="clearPopup" style="display: none">
+    <h3>เลือกเอกสารและรายการที่ต้องการลบ</h3>
+    <h4>เอกสารที่มี:</h4>
+    <ul id="documentList" style="list-style: none; padding: 0"></ul>
+    <!-- รายชื่อเอกสาร -->
+    <h4>รายการในเอกสาร:</h4>
+    <button id="toggleItemListBtn" class="toggle-btn" onclick="toggleItemList()">*แสดงรายการ</button>
+    <ul id="itemList" style="list-style: none; padding: 0; display: none;"></ul>
+    <!-- รายการในเอกสาร --><br>
+    <div class="button-group">
+      <button id="deleteBtn" class="action-btn delete-btn" onclick="deleteSelectedItems()">❌ ลบที่เลือก</button>
+      <button id="closeBtn" class="action-btn close-btn" onclick="closeClearPopup()">✖ ปิด</button>
+    </div>
+
+  </div>
+
+  <script>
+    function addNewItem(name = "", qty = "", price = "", imageName = "") {
+      const customItemsContainer = document.getElementById("customItems");
+      const div = document.createElement("div");
+      div.className = "custom-item";
+      div.innerHTML = `
+    <input type="text" placeholder="ชื่อรายการ" class="item-name" value="${name}">
+    <input type="number" placeholder="จำนวน" class="item-qty" min="0" value="${qty}">
+    <input type="number" placeholder="ราคา" class="item-price" min="0" value="${price}">
+    <select class="item-image-name">
+      <option value="">เลือกชื่อรูปภาพ</option>
+    </select>
+    <img src="${imageName || ""
+        }" alt="Preview" class="image-preview" style="width:50px; height:auto; display:${imageName ? "block" : "none"
+        };">
+  `;
+      customItemsContainer.appendChild(div);
+
+      const selectElement = div.querySelector(".item-image-name");
+      const inputNameElement = div.querySelector(".item-name");
+
+      // โหลดตัวเลือกเริ่มต้นใน dropdown
+      populateImageOptions(selectElement, imageName, name);
+
+      // เมื่อชื่อรายการเปลี่ยน ให้อัปเดต dropdown
+      inputNameElement.addEventListener("input", () => {
+        const currentName = inputNameElement.value.trim();
+        if (currentName) {
+          populateImageOptions(selectElement, "", currentName);
+        }
+      });
+
+      // เมื่อเลือกชื่อรูปภาพ ให้อัปเดตชื่อรายการ
+      selectElement.addEventListener("change", (event) => {
+        const selectedOptionText =
+          event.target.options[event.target.selectedIndex].text;
+        if (selectedOptionText) {
+          inputNameElement.value = selectedOptionText.split(".")[0]; // นำชื่อไฟล์ (ไม่รวม .jpg) ไปใส่ในช่องชื่อรายการ
+        }
+      });
+    }
+
+    function findClosestImages(inputName, images) {
+      const lowerInputName = inputName.toLowerCase();
+      return images.filter((image) =>
+        image.toLowerCase().includes(lowerInputName)
+      );
+    }
+
+    function populateImageOptions(
+      selectElement,
+      selectedImage = "",
+      itemName = ""
+    ) {
+      const imageFolder = "images";
+      const imageDetails = {
+        "น้ำยาซักผ้าBestClean.jpg": "",
+        "สบู่ก้อน.jpg": "",
+        "เวเฟอร์สติ๊กรสครีมสตอเบอรี่.jpg": "",
+        "เวเฟอร์สติ๊กรสช็อกโกแลต.jpg": "",
+        "เวเฟอร์สติ๊กรสใบเตย.jpg": "",
+        "เวเฟอร์สติ๊กรสลายจุดช็อกโกแลต.jpg": "",
+        "เวเฟอร์สติ๊กรสลายจุดบลูเบอร์รี่.jpg": "",
+        "ขนมมันจังรสข้าวโพดบาร์บีคิว.jpg": "",
+        "ขนมมันจังรสโนริสาหร่าย.jpg": "",
+        "ขนมผิง.jpg": "",
+        "ขนมปูแซ่บรสบาร์บีคิว.jpg": "",
+        "ขนมคุกกี้รูปหมีน้อย.jpg": "",
+        "ขนมขาไก่ 5 รส.jpg": "",
+        "ขนมขาไก่ใหญ่.jpg": "",
+        "ขนมปังกรอบรสแยมสับปะรด.jpg": "",
+        "น้ำส้มคั้นสด.jpg": "",
+        "น้ำโอวัลติน.jpg": "",
+        "น้ำโกโก้.jpg": "",
+        "น้ำกาแฟ.jpg": "",
+        "น้ำชาไทย.jpg": "",
+        "น้ำชาเขียว.jpg": "",
+        "น้ำนมชมพู.jpg": "",
+        "น้ำนมสดสตอเบอรี่.jpg": "",
+        "น้ำนมสดบลูเบอร์รี่.jpg": "",
+        "น้ำนมสดสับปะรด.jpg": "",
+        "น้ำนมสดแตงโม.jpg": "",
+        "น้ำนมสดใบเตย.jpg": "",
+        "น้ำแตงโม.jpg": "",
+        "น้ำลำไย.jpg": "",
+        "เฉาก๊วยขวด.jpg": "",
+        "สลัดโรล.jpg": "สลัดโรลพร้อมน้ำสลัดซีฟู้ด",
+        "เบอร์เกอร์ไก่.jpg": "ขนมปังฟาร์มเฮ้าส์ ไก่ชิ้นใหญ่ มีผัก",
+        "เบอร์เกอร์ไก่ชีส.jpg":
+          "ขนมปังฟาร์มเฮ้าส์ ไก่ชิ้นใหญ่ มีผัก พร้อมชีสเต็มแผ่น",
+        "ทูน่าบาโลน่า.jpg": "ขนมปังโฮลวีท ไม่มีผัก",
+        "ทูน่าบาโลน่าผัก.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ทูน่าผักอัญชัน.jpg": "ขนมปังโฮลวีท มีผักสลัดและดอกอัญชัน",
+        "ปูอัดอัญชัน.jpg": "ขนมปังโฮลวีท มีผักสลัดและดอกอัญชัน",
+        "บาโลน่าอัญชันผัก.jpg": "ขนมปังโฮลวีท มีผักสลัดและดอกอัญชัน",
+        "ไข่ผักอัญชัน.jpg": "ขนมปังโฮลวีท มีผักสลัดและดอกอัญชัน",
+        "ไข่บาโลน่า.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ไข่ทูน่า.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ไข่สาหร่ายแดง.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ไข่สาหร่ายเขียว.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ไข่ปูอัด.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ไข่ข้าวโพด.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ไข่บาโลน่า.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ข้าวโพดผัก.jpg": "ขนมปังขาวฟาร์มเฮ้าส์ มีผัก",
+        "ข้าวโพดโฮลวีท.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ข้าวโพดบาโลน่าโฮลวีท.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ปูอัดบาโลน่า.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ปูอัดทูน่า.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ปูอัดสาหร่ายเขียว.jpg": "ขนมปังโฮลวีท มีผัก",
+        "ฝอยทองเขียว.jpg": "หวานๆ ขนมปังโฮลวีท ไม่มีผัก",
+        "ฝอยทองเนย.jpg": "หวานๆ ขนมปังโฮลวีท ไม่มีผัก",
+        "ฝอยทองโฮลวีท.jpg": "หวานๆ ขนมปังโฮลวีท ไม่มีผัก",
+        "สาหร่ายเขียว-แดง-บาโลน่า.jpg": "ขนมปังโฮลวีท ไม่มีผัก",
+        "สาหร่ายเขียวบาโลน่า.jpg": "ขนมปังโฮลวีท ไม่มีผัก",
+        "สาหร่ายแดงบาโลน่า.jpg": "ขนมปังโฮลวีท ไม่มีผัก",
+        "สาหร่ายล้วน.jpg": "ขนมปังโฮลวีท ไม่มีผัก",
+        "ไส้กรอก.jpg": "ขนมปังโฮลวีท มีผัก",
+        "หมูหยองบาโลน่าโฮลวีท.jpg": "ขนมปังโฮลวีท ไม่มีผัก",
+        "หมูหยองบาโลน่าน้ำสลัดโบราณ.jpg": "ขนมปังโฮลวีท ไม่มีผัก",
+        "หมูหยองบาโลน่า15บาท.jpg": "ขนมปังขาวฟาร์มเฮ้าส์ ไม่มีผัก",
+        "ข้าวโพดบาโลน่า15บาท.jpg": "ขนมปังขาวฟาร์มเฮ้าส์ มีผัก",
+        "แยมสตอเบอรี่.jpg": "ขนมปังขาวฟาร์มเฮ้าส์ ไม่มีผัก",
+        "แยมบลูเบอร์รี่.jpg": "ขนมปังขาวฟาร์มเฮ้าส์ ไม่มีผัก",
+        "แยมสังขยา.jpg": "ขนมปังขาวฟาร์มเฮ้าส์ ไม่มีผัก",
+        "แยมส้ม.jpg": "ขนมปังขาวฟาร์มเฮ้าส์ ไม่มีผัก",
+        "แยมกล้วยหอม.jpg": "ขนมปังขาวฟาร์มเฮ้าส์ ไม่มีผัก",
+        "ส้มจี๊ด.jpg": "ผักสดๆจากสวนเจ้าของร้าน",
+        "ใบเหลียง.jpg": "ผักสดๆจากสวนเจ้าของร้าน",
+        "ใบแป้น.jpg": "",
+        "ผักหวาน.jpg": "",
+        "มะละกอ.jpg": "ผักสดๆจากสวนเจ้าของร้าน",
+        "พริกกล่องเล็ก.jpg": "ผักสดๆจากสวนเจ้าของร้าน",
+        "พริก.jpg": "ผักสดๆจากสวนเจ้าของร้าน",
+        "มะม่วงช่อ.jpg": "ผักสดๆจากสวนเจ้าของร้าน",
+        "มะเขือ.jpg": "ผักสดๆจากสวนเจ้าของร้าน",
+        "มะนาว.jpg": "ผักสดๆจากสวนเจ้าของร้าน",
+        "มะม่วงแช่อิ่ม.jpg": "",
+        "กระเจี๊ยบเขียว.jpg": "",
+        "ฟักเขียวอีสาน.jpg": "",
+        "ปลีกล้วย.jpg": "",
+        "มะยมฝรั่ง.jpg": "",
+        "ลูกเชอรี่พร้อมพริกเกลือ.jpg": "",
+        "เฉาก๊วยถุง+ถ้วย.jpg": "",
+        "เค๊กกล้วยหอม.jpg": "",
+        "ทิชชู่เปียก.jpg": "",
+        "ทิชชู่.jpg": "",
+      };
+
+      const images = Object.keys(imageDetails); // ดึงรายการรูปภาพจาก imageDetails
+      const filteredImages = itemName
+        ? findClosestImages(itemName, images)
+        : images;
+
+      // เคลียร์ตัวเลือกเก่าทั้งหมด
+      selectElement.innerHTML = `<option value="">เลือกชื่อรูปภาพ</option>`;
+
+      // เพิ่มตัวเลือกใหม่
+      filteredImages.forEach((image) => {
+        const option = document.createElement("option");
+        option.value = `${imageFolder}/${image}`;
+        option.textContent = `${image}`;
+        if (option.value === selectedImage) {
+          option.selected = true;
+        }
+        selectElement.appendChild(option);
+      });
+      // เมื่อเลือกชื่อรูปภาพ ให้อัปเดตรายละเอียด
+      selectElement.addEventListener("change", (event) => {
+        const selectedImageName = event.target.value.split("/").pop(); // ดึงชื่อไฟล์จาก value
+        const description =
+          imageDetails[selectedImageName] || "ไม่มีรายละเอียด";
+        const customItem = selectElement.closest(".custom-item"); // หา container หลัก
+        if (customItem) {
+          customItem.dataset.description = description; // บันทึก description ใน dataset
+        }
+      });
+    }
+
+    // คำนวณยอดรวม
+    function calculateTotal() {
+      const items = Array.from(document.querySelectorAll(".custom-item"));
+      let total = 0;
+      const rows = items.map((item) => {
+        const name = item.querySelector(".item-name").value || "ไม่มีชื่อ";
+        const qty = parseInt(item.querySelector(".item-qty").value) || 0;
+        const price = parseInt(item.querySelector(".item-price").value) || 0;
+        const imageUrl = item.querySelector(".item-image-name").value || "images/9.jpg";
+        const sum = qty * price;
+        total += sum;
+
+        return `
+      <tr>
+        <td>${name}</td>
+        <td>${qty}</td>
+        <td>${price}</td>
+        <td>${sum}</td>
+        <td><img src="${imageUrl}" alt="Image" style="width:50px; height:auto;"></td>
+      </tr>`;
+      });
+
+      document.getElementById("results").innerHTML = `
+    <table border="1">
+      <tr><th>ชื่อ</th><th>จำนวน</th><th>ราคา</th><th>รวม</th><th>รูปภาพ</th></tr>
+      ${rows.join("")}
+      <tr><td colspan="3">ยอดรวม</td><td>${total}</td><td></td></tr>
+    </table>`;
+    }
+
+    function saveData() {
+      const items = Array.from(document.querySelectorAll(".custom-item")).map(
+        (item) => ({
+          name: item.querySelector(".item-name").value || "ไม่มีชื่อ",
+          qty: parseInt(item.querySelector(".item-qty").value) || 0,
+          price: parseInt(item.querySelector(".item-price").value) || 0,
+          imageUrl: item.querySelector(".item-image-name").value || "images/9.jpg",
+          description: item.dataset.description || "ไม่มีรายละเอียด", // ดึง description จาก dataset
+        })
+      );
+
+      db.collection("mama")
+        .add({
+          items: items,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          alert("บันทึกข้อมูลเรียบร้อย");
+        })
+        .catch((error) => {
+          console.error("Error saving data: ", error);
+        });
+    }
+
+    // บันทึกรูปภาพ
+    document.getElementById("saveImageBtn").addEventListener("click", () => {
+      html2canvas(document.getElementById("results"))
+        .then((canvas) => {
+          const link = document.createElement("a");
+          link.href = canvas.toDataURL("image/png");
+          link.download = "summary.png";
+          link.click();
+        })
+        .catch((error) => console.error("Error saving image: ", error));
+    });
+
+    // แสดงป๊อปอัปเคลียร์ข้อมูล
+    function showClearPopup() {
+      const documentList = document.getElementById("documentList");
+      const itemList = document.getElementById("itemList");
+
+      db.collection("mama").orderBy("timestamp", "desc").get().then((snapshot) => {
+        documentList.innerHTML = "";
+        itemList.innerHTML = "";
+
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const items = Array.isArray(data.items) ? data.items : [];
+          const formattedTimestamp = data.timestamp
+            ? new Date(data.timestamp.seconds * 1000).toLocaleString("th-TH")
+            : "ไม่ระบุเวลา";
+
+          const docLi = document.createElement("li");
+          docLi.innerHTML = `
+        <label>
+          <input type="checkbox" class="document-checkbox" data-doc-id="${doc.id}" />
+          ${formattedTimestamp} (${items.length} รายการ)
+        </label>`;
+          documentList.appendChild(docLi);
+
+          items.forEach((item, index) => {
+            const itemLi = document.createElement("li");
+            itemLi.innerHTML = `
+          <label>
+            <input type="checkbox" class="item-checkbox" data-doc-id="${doc.id}" data-item-index="${index}" />
+            ${item.name} - จำนวน: ${item.qty}, ราคา: ${item.price}
+          </label>`;
+            itemList.appendChild(itemLi);
+          });
+        });
+
+        document.getElementById("clearPopup").style.display = "block";
+      }).catch((error) => {
+        console.error("Error fetching data from Firebase: ", error);
+      });
+    }
+    // ปิดป๊อปอัป
+    function closeClearPopup() {
+      document.getElementById("clearPopup").style.display = "none";
+    }
+
+    function deleteSelectedItems() {
+      const selectedDocuments = Array.from(document.querySelectorAll(".document-checkbox:checked"));
+      const selectedItems = Array.from(document.querySelectorAll(".item-checkbox:checked"));
+
+      let deletePromises = [];
+
+      // 🔹 ลบเอกสารที่ถูกเลือก
+      selectedDocuments.forEach((checkbox) => {
+        const docId = checkbox.getAttribute("data-doc-id");
+        deletePromises.push(db.collection("mama").doc(docId).delete());
+      });
+
+      // 🔹 ลบเฉพาะรายการสินค้าในเอกสาร (ไม่ลบทั้งเอกสาร)
+      let itemDeleteMap = {}; // เก็บรายการสินค้าที่ต้องลบแยกตามเอกสาร
+
+      selectedItems.forEach((checkbox) => {
+        const docId = checkbox.getAttribute("data-doc-id");
+        const itemIndex = parseInt(checkbox.getAttribute("data-item-index"));
+
+        if (!itemDeleteMap[docId]) {
+          itemDeleteMap[docId] = [];
+        }
+        itemDeleteMap[docId].push(itemIndex);
+      });
+
+      Object.keys(itemDeleteMap).forEach((docId) => {
+        deletePromises.push(
+          db.collection("mama").doc(docId).get().then((doc) => {
+            if (doc.exists) {
+              let data = doc.data();
+              let updatedItems = data.items.filter((_, index) => !itemDeleteMap[docId].includes(index));
+
+              if (updatedItems.length === 0) {
+                return db.collection("mama").doc(docId).delete(); // ลบเอกสารถ้าไม่มีรายการเหลือ
+              } else {
+                return db.collection("mama").doc(docId).update({ items: updatedItems });
+              }
+            }
+          })
+        );
+      });
+
+      // 🔹 ดำเนินการลบทั้งหมด
+      Promise.all(deletePromises)
+        .then(() => {
+          alert("ลบข้อมูลเรียบร้อย!");
+          location.reload(); // รีโหลดหน้าใหม่
+        })
+        .catch((error) => console.error("Error deleting documents/items:", error));
+    }
+
+    function toggleItemList() {
+      const itemList = document.getElementById("itemList");
+      const toggleBtn = document.getElementById("toggleItemListBtn");
+
+      if (itemList.style.display === "none") {
+        itemList.style.display = "block";
+        toggleBtn.textContent = "*ซ่อนรายการ";
+      } else {
+        itemList.style.display = "none";
+        toggleBtn.textContent = "*แสดงรายการ";
+      }
+    }
+
+    function closeClearPopup() {
+      document.getElementById("clearPopup").style.display = "none";
+    }
+
+    function loadItemsFromFirebase() {
+      db.collection("mama")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get()
+        .then((snapshot) => {
+          if (!snapshot.empty) {
+            snapshot.forEach((doc) => {
+              const data = doc.data();
+              const items = Array.isArray(data.items) ? data.items : [];
+              console.log("Loaded items:", items);
+
+              items.forEach((item) => {
+                addNewItem(item.name, item.qty, item.price, item.imageUrl); // ส่งชื่อและ URL รูปภาพ
+              });
+            });
+          } else {
+            console.log("ไม่มีข้อมูลใน Firebase");
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching data from Firebase: ", error);
+        });
+    }
+
+    function fetchLatestData() {
+      db.collection("mama")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get()
+        .then((snapshot) => {
+          if (snapshot.empty) {
+            console.log("No latest data found");
+            document.getElementById("results").innerHTML =
+              "<p>ไม่มีข้อมูลล่าสุด</p>";
+            return;
+          }
+
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const items = Array.isArray(data.items) ? data.items : [];
+            console.log("Fetched items:", items);
+
+            // ✅ แปลง timestamp เป็นวันที่-เวลา
+            let formattedDate = "ไม่ระบุเวลา";
+            if (data.timestamp) {
+              const timestamp = data.timestamp;
+              const date = new Date(timestamp.seconds * 1000);
+              formattedDate = date.toLocaleString("th-TH", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              });
+            }
+
+            let total = 0;
+            const rows = items.map((item) => {
+              const sum = item.qty * item.price;
+              total += sum;
+              return `
+            <tr>
+              <td>${item.name}</td>
+              <td>${item.qty}</td>
+              <td>${item.price}</td>
+              <td>${sum}</td>
+              <td><img src="${item.imageUrl || 'images/9.jpg'}" alt="Image" style="width:50px; height:auto;"></td>
+            </tr>
+          `;
+            });
+
+            // ✅ เพิ่มวันที่-เวลาบนสุดของตาราง
+            document.getElementById("results").innerHTML = `
+          <h3 class="date-header">วันที่ ${formattedDate}</h3>
+          <table border="1">
+            <tr><th>ชื่อ</th><th>จำนวน</th><th>ราคา</th><th>รวม</th><th>รูปภาพ</th></tr>
+            ${rows.join("")}
+            <tr><td colspan="3">ยอดรวม</td><td>${total}</td><td></td></tr>
+          </table>
+        `;
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching latest data: ", error);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchLatestData(); // ดึงข้อมูลล่าสุดจาก Firestore
+      loadItemsFromFirebase(); // ดึงข้อมูลจาก Firebase และแสดงในฟอร์ม
+    });
+
+    // คำนวณยอดรวมเมื่อมีการเปลี่ยนแปลงข้อมูล
+    document.addEventListener("input", calculateTotal);
+  </script>
+</body>
+
+</html>

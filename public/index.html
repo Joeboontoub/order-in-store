@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>โชว์จำนวนสต๊อกสินค้าหน้าร้าน</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+  <style>
+    /* พื้นหลังและข้อความในหน้าหลัก */
+    body {
+      background-image: url(images/39.jpg);
+      background-size: cover;
+      background-position: center;
+      filter: brightness(90%);
+      background-attachment: fixed;
+      font-family: 'Prompt', sans-serif;
+      color: #fff; 
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ส่วนหัวข้อความ */
+    h6 {
+      background-color: rgba(0, 0, 0, 0.726);
+      color: #ffffff;
+      border-radius: 10px;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+    }
+
+    /* ตาราง */
+    .table {
+      width: 100%;
+      margin: 20px auto;
+      background-color: rgba(255, 255, 255, 0);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0);
+    }
+
+    /* ส่วนหัวของตาราง */
+    .table th {
+      background-color: #000000;
+      color: #ffbb00;
+      font-weight: bold;
+      text-align: center;
+      padding: 5px;
+      border: 1px solid #ffffff00;
+      border-radius: 3px;
+      text-transform: uppercase;
+      /* ข้อความเป็นตัวพิมพ์ใหญ่ */
+    }
+
+    /* แถวของตาราง */
+    .table td {
+      text-align: center;
+      padding: 2px;
+      border: 2px solid #000000;
+      border-radius: 5px;
+      background-color: #ffffffd8;
+      color: #000000;
+    }
+
+    .table th,
+    .table td {
+      padding: 5px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    /* ชื่อสินค้าในตาราง */
+    .table td.name-cell {
+      max-width: 70px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+
+    /* รูปภาพในตาราง */
+    .table td img {
+      position: relative;
+      width: 40px;
+      height: 50px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      border: 3px solid #000000;
+      border-radius: 5px;
+    }
+
+    .table td img:hover {
+      transform: scale(1.2);
+      /* ขยายเล็กน้อยเมื่อชี้เมาส์ */
+    }
+
+    .image-popup {
+      position: absolute;
+      /* เปลี่ยนจาก fixed เป็น absolute */
+      background-color: rgba(0, 0, 0, 0.8);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .image-popup img {
+      max-width: 250px;
+      /* ขนาดภาพป็อปอัปเริ่มต้น */
+      max-height: 250px;
+      border-radius: 8px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      color: white;
+      font-size: 24px;
+      border: none;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .image-description {
+      background-color: rgba(165, 236, 0, 0.836);
+      color: rgb(0, 0, 0);
+      border: 3px solid #ffffff;
+      border-radius: 10px;
+      padding: 5px;
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    /* ส่วนหัวที่ต้องการเน้น */
+    .table th.special {
+      background-color: #ffcc00;
+      color: #000000;
+      border: 1px solid #00000000;
+    }
+
+    .table th.coll {
+      background-color: #000000;
+      color: #fdba00;
+      border: 1px solid #00000000;
+
+    }
+
+    .border-green {
+      border: 3px solid green !important;
+    }
+
+    .border-yellow {
+      border: 3px solid yellow !important;
+    }
+
+    .border-red {
+      border: 3px solid red !important;
+    }
+
+    /* ปุ่ม */
+    .button-container {
+      display: flex;
+      /* ใช้ Flexbox จัดตำแหน่งปุ่ม */
+      justify-content: center;
+      /* จัดตำแหน่งให้อยู่ตรงกลาง */
+      gap: 70px;
+      /* ระยะห่างระหว่างปุ่ม 10px (ประมาณ 1 ซม.) */
+      margin-top: 20px;
+      /* เพิ่มระยะห่างด้านบน */
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button#joe {
+      background-color: #ffc400;
+      color: #000000;
+    }
+
+    button#joe:hover {
+      background-color: #ffc400c4;
+      transform: scale(1.05);
+    }
+
+    button#faa {
+      background-color: #ec0000;
+      color: #ffffff;
+    }
+
+    button#faa:hover {
+      background-color: #ec000093;
+      transform: scale(1.05);
+    }
+
+    /* วิดีโอ */
+    .video-container {
+      background-color: #000000;
+      margin: 20px auto;
+      box-shadow: 0px 4px 8px rgb(0, 0, 0);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .video-container iframe {
+      border: none;
+      background-color: #000000;
+    }
+
+    video {
+      border-radius: 10px;
+    }
+
+    .modal-content {
+      position: absolute;
+      bottom: 9px;
+      left: 10px auto;
+      right: auto;
+      width: 100%;
+      background-color: #000000cb;
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+  </style>
+  <!-- Bootstrap JS (สำหรับใช้งาน Modal) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
+      authDomain: "jojutjan.firebaseapp.com",
+      projectId: "jojutjan",
+      storageBucket: "jojutjan.firebasestorage.app",
+      messagingSenderId: "1010237466401",
+      appId: "1:1010237466401:web:88855a3237647f1718c060",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+</head>
+
+<!-- Modal Popup สำหรับแสดงคำสั่งซื้อ -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">รายละเอียดคำสั่งซื้อ</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <textarea id="orderDetailsText" class="form-control" rows="10" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<body>
+  <audio id="inputSound" src="music/pim.mp3" preload="auto"></audio>
+  <audio id="buttonSound" src="music/songs1.mp3" preload="auto"></audio>
+
+  <audio id="click-sound">
+    <source src="music/songs1.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+  <audio id="sound">
+    <source src="music/cm1.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+  <div class="container">
+    <div class="video-container text-center">
+      <video id="localVideo" width="100%" height="200" autoplay muted loop controls>
+        <source src="faa9.mp4" type="video/mp4" />
+        วิดีโอนี้ไม่สามารถเล่นได้
+      </video>
+      <iframe id="videoFrame" src="" width="100%" height="200" frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+      <span id="realTimeClock"
+        style="background-color: #ff0000; color: rgb(255, 255, 255); border-radius: 5px; font-weight: bold; font-size: 12px; padding: 3px; text-align: center;"></span><br>
+      <p style="margin-bottom: 5px; font-size: 12px; color: rgb(255, 0, 0);">*วิดีโอไลฟ์สด 06:00 จนเก็บร้าน (ไม่เกิน
+        09:30 น.)</p>
+    </div>
+    <h6 style="color: rgb(255, 255, 255);">———————————————————————<br>👇🏻
+      ใส่จำนวนที่ต้องการ<b style="color: #ecc100; white-space: nowrap;">"จอง"</b>
+      และกด<b style="color: #ff0000; white-space: nowrap;">"เพิ่มลงตะกร้า"</b>
+    </h6>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ชื่อ</th>
+          <th>*รูป</th>
+          <th>ราคา</th>
+          <th class="special">มี</th>
+          <th class="coll">จอง</th>
+        </tr>
+      </thead>
+      <tbody id="productTable">
+
+      </tbody>
+    </table>
+    <div class="text-end mt-3">
+      <div id="imagePopup" class="image-popup">
+        <button id="closePopup" class="close-btn">&times;</button>
+        <img id="popupImage" src="" alt="รูปภาพขยาย">
+        <p id="imageDescription" class="image-description"></p>
+      </div>
+    </div>
+    <div class="button-container">
+      <button id="joe" class="btn btn-info" onclick="searchOrder()">ดูบิลของคุณ</button>
+      <button id="faa" class="btn btn-success" onclick="processCart();">
+        เพิ่มลงตะกร้า
+      </button>
+    </div>
+    <br>
+    <div style="font-size: 13px;">
+      <span style="color: rgb(255, 242, 242);"><strong style="color: #ffffff;">หมายเหตุ: กรอบสีใน
+          ⬜ช่อง" มี "</strong></span>
+      <li><span style="color: rgb(0, 255, 0);">🟢 <strong>5 ชิ้นขึ้นไป:</strong> เส้นขอบสีเขียว</span></li>
+      <li><span style="color: rgb(255, 251, 0);">🟡 <strong>1 - 4 ชิ้น:</strong> เส้นขอบสีเหลือง</span></li>
+      <li><span style="color: rgb(255, 0, 0);">🔴 <strong>0 ชิ้น(หมด):</strong> เส้นขอบสีแดง</span></li>
+    </div>
+    <script>
+      let cart = []; // ตัวแปรเก็บข้อมูลสินค้าในตะกร้า
+      let stockData = []; // เก็บข้อมูลสินค้า
+      let total = 0;
+
+      function adjustDisplayStock(originalStock, cartList) {
+        const adjusted = originalStock.map(product => {
+          const cartItem = cartList.find(item => item.name === product.name);
+          const adjustedQty = cartItem
+            ? Math.max((product.remainingQty ?? product.qty) - cartItem.qty, 0)
+            : (product.remainingQty ?? product.qty);
+
+          return {
+            ...product,
+            adjustedRemainingQty: adjustedQty // 👈 ไม่แตะ remainingQty เดิม
+          };
+        });
+
+        return adjusted;
+      }
+
+      async function loadProducts() {
+        try {
+          const productTable = document.getElementById("productTable");
+
+          db.collection("mama").orderBy("timestamp", "desc").limit(1)
+            .onSnapshot(snapshot => {
+              if (snapshot.empty) {
+                productTable.innerHTML = "<tr><td colspan='5'>ไม่มีข้อมูลสินค้า</td></tr>";
+                return;
+              }
+
+              const latestDoc = snapshot.docs[0];
+              const items = latestDoc.data().items || [];
+              const docId = latestDoc.id;
+
+              loadCartFromLocalStorage();
+              let rawStock = items.map((item, index) => ({
+                ...item,
+                remainingQty: item.remainingQty ?? item.qty,
+                index,
+                docId
+              }));
+              stockData = adjustDisplayStock(rawStock, cart);
+
+
+              // แสดงรายการสินค้า
+              productTable.innerHTML = stockData.map((product, index) => `
+          <tr>
+            <td class="name-cell" data-fullname="${product.name} ${product.description}">
+              ${product.name.length > 15 ? product.name.substring(0, 15) + "..." : product.name}
+            </td>
+            <td>
+              <img src="${product.imageUrl || 'images/9.jpg'}" alt="${product.name}" style="max-width:40px; max-height:50px;" class="popup-trigger">
+            </td>
+            <td>${product.price} ฿</td>
+            <td id="remaining-${index}" class="${getBorderClass(product.adjustedRemainingQty)}">
+  ${product.adjustedRemainingQty} ชิ้น</td>
+            <td><input type="number" id="qty-${index}" min="1" max="${product.remainingQty}" class="form-control"></td>
+          </tr>
+        `).join("");
+
+              setupNameAndImageListeners(); // คลิกชื่อและภาพ
+              setupInputListeners();        // เสียง input
+            });
+        } catch (error) {
+          console.error("Error loading products:", error);
+          alert("ไม่สามารถโหลดข้อมูลสินค้าได้");
+        }
+      }
+      // ใช้สีขอบเพื่อแสดงสถานะจำนวนคงเหลือ
+      function getBorderClass(qty) {
+        if (qty >= 5) return "border-green";
+        if (qty >= 1) return "border-yellow";
+        return "border-red";
+      }
+
+      function getBorderClass(qty) {
+        if (qty >= 5) return "border-green";
+        if (qty >= 1) return "border-yellow";
+        return "border-red";
+      }
+
+      function setupNameAndImageListeners() {
+        // จัดการชื่อสินค้า
+        const nameCells = document.querySelectorAll(".name-cell");
+        nameCells.forEach(cell => {
+          cell.addEventListener("click", () => {
+            alert(`รายละเอียด: ${cell.getAttribute("data-fullname")}`);
+          });
+        });
+
+        // จัดการรูปภาพสำหรับป๊อปอัป
+        const popup = document.getElementById("imagePopup");
+        const popupImage = document.getElementById("popupImage");
+        const closePopup = document.getElementById("closePopup");
+        const imageDescription = document.getElementById("imageDescription");
+        const images = document.querySelectorAll(".popup-trigger");
+
+        images.forEach((img) => {
+          img.addEventListener("click", (event) => {
+            const rect = img.getBoundingClientRect(); // ดึงตำแหน่งของรูปภาพต้นฉบับ
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            // เล่นเสียงเมื่อคลิกที่รูปภาพ
+            const imageClickSound = document.getElementById("buttonSound");
+            imageClickSound.currentTime = 0; // รีเซ็ตเสียงให้เริ่มต้นทุกครั้ง
+            imageClickSound.play();
+
+            // แสดงป๊อปอัปชั่วคราวเพื่อคำนวณขนาด
+            popup.style.display = "flex";
+            popupImage.src = img.src; // ตั้งค่ารูปภาพ
+            popupImage.alt = img.alt; // เพิ่มคำอธิบาย
+            imageDescription.textContent = img.alt || "ไม่มีคำอธิบาย";
+
+            // คำนวณตำแหน่ง "ด้านบน" ของรูปภาพ
+            popup.style.top = `${rect.top + scrollTop - popup.offsetHeight - 30}px`;
+            popup.style.left = `${rect.left}px`;
+          });
+        });
+
+        // ปิดป็อปอัปเมื่อคลิกที่ปุ่ม
+        closePopup.addEventListener("click", () => {
+          popup.style.display = "none";
+        });
+        // เพิ่มสไตล์ให้ปุ่มปิด
+        closePopup.style.backgroundColor = "#ff4444"; // สีพื้นหลัง
+        closePopup.style.color = "#ffffff"; // สีตัวอักษร
+        closePopup.style.border = "2px solid #ff8888"; // ขอบ
+        closePopup.style.borderRadius = "5px"; // ขอบโค้งมน
+        closePopup.style.padding = "5px 10px"; // ระยะห่างในปุ่ม
+        closePopup.style.cursor = "pointer"; // เปลี่ยนเมาส์เป็น pointer
+        closePopup.style.fontSize = "18px"; // ขนาดตัวอักษร
+
+        // ปิดป็อปอัปเมื่อคลิกที่พื้นที่ว่าง
+        popup.addEventListener("click", (event) => {
+          if (event.target === popup) {
+            popup.style.display = "none";
+          }
+        });
+
+        // ปิดป็อปอัปเมื่อกดปุ่ม "Esc"
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            popup.style.display = "none";
+          }
+        });
+
+      }
+
+      // เพิ่มฟังก์ชันสำหรับการตั้งค่าช่อง Input
+      function setupInputListeners() {
+        const inputSound = document.getElementById("inputSound");
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+          input.addEventListener("focus", () => {
+            inputSound.currentTime = 0; // เล่นเสียงตั้งแต่ต้น
+            inputSound.play();
+          });
+          input.addEventListener("input", () => {
+            inputSound.currentTime = 0; // เล่นเสียงตั้งแต่ต้น
+            inputSound.play();
+          });
+        });
+      }
+
+      async function processCart() {
+        const invalidItems = []; // เก็บรายการที่มีปัญหา
+        let hasInvalidItems = false; // ตัวแปรบอกว่ามีสินค้าที่ไม่ถูกต้องหรือไม่
+
+        // ตรวจสอบสินค้าก่อนเพิ่มลงตะกร้า
+        stockData.forEach((product, index) => {
+          const qtyInput = document.getElementById(`qty-${index}`);
+          const qty = parseInt(qtyInput.value);
+
+          // ถ้าจำนวนเกินกว่าสินค้าที่เหลือ
+          if (qty > product.remainingQty) {
+            invalidItems.push({
+              name: product.name,
+              remainingQty: product.remainingQty,
+            });
+            qtyInput.value = ''; // ล้างค่าช่องอินพุต
+            hasInvalidItems = true; // แจ้งว่ามีสินค้าที่ไม่ถูกต้อง
+          }
+        });
+
+        // ถ้ามีสินค้าเกินสต็อก ให้แจ้งเตือนและไม่ดำเนินการต่อ
+        if (hasInvalidItems) {
+          const errorMessage = invalidItems
+            .map(
+              (item) =>
+                `- ${item.name}: มีเพียง ${item.remainingQty} ชิ้นที่สามารถเลือกได้`
+            )
+            .join('\n');
+          alert(
+            `จำนวนสินค้าบางรายการเกินสต็อก กรุณาแก้ไข:\n\n${errorMessage}`
+          );
+          return; // ออกจากฟังก์ชันโดยไม่เพิ่มสินค้า
+        }
+
+        // ดำเนินการเพิ่มสินค้าลงตะกร้า
+        const selectedItems = stockData.map((product, index) => {
+          const qtyInput = document.getElementById(`qty-${index}`);
+          const qty = parseInt(qtyInput.value);
+
+          if (!isNaN(qty) && qty > 0 && qty <= product.remainingQty) {
+            product.remainingQty -= qty; // อัปเดตจำนวนที่เหลือ
+            return { ...product, qty }; // เพิ่มข้อมูลสินค้า
+          }
+          return null; // ข้ามสินค้าที่ไม่ได้เลือก
+        }).filter((item) => item !== null); // กรองสินค้าที่ไม่ถูกต้องออก
+        try {
+          const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+          const updatedCart = [...existingCart, ...selectedItems];
+          localStorage.setItem("cart", JSON.stringify(updatedCart));
+          window.location.href = "cart.html"; // ไปหน้าตะกร้า
+        } catch (error) {
+          console.error("Error processing cart:", error);
+          alert("เกิดข้อผิดพลาดในการเพิ่มสินค้า");
+        }
+      }
+
+      function loadCartFromLocalStorage() {
+        const storedCart = localStorage.getItem("cart");
+        if (storedCart) {
+          try {
+            const parsedCart = JSON.parse(storedCart);
+            if (Array.isArray(parsedCart)) {
+              cart = parsedCart; // โหลดข้อมูลตะกร้ากลับมาที่ตัวแปร cart
+            }
+          } catch (error) {
+            console.error("Error parsing cart from Local Storage:", error);
+          }
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadVideo();
+        loadProducts(); // โหลดข้อมูลสินค้า
+        loadCartFromLocalStorage(); // โหลดข้อมูลตะกร้าสินค้า
+        setupInputListeners();
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const buttonSound = document.getElementById("buttonSound");
+        // เล่นเสียงเมื่อคลิกปุ่ม
+        document.querySelectorAll("button").forEach((button) => {
+          button.addEventListener("click", () => {
+            buttonSound.currentTime = 0; // รีเซ็ตเสียง
+            buttonSound.play(); // เล่นเสียง
+          });
+        });
+      });
+
+      async function searchOrder() {
+        const clickSound = document.getElementById("click-sound");
+        clickSound.play();
+
+        const customerPhone = prompt("กรุณากรอกเบอร์โทรของคุณเพื่อค้นหาคำสั่งซื้อ:");
+        if (!customerPhone) {
+          alert("กรุณากรอกเบอร์โทร");
+          return;
+        }
+
+        try {
+          const querySnapshot = await db
+            .collection("order")
+            .where("customerPhone", "==", customerPhone)
+            .orderBy("timestamp", "desc")
+            .get();
+
+          if (querySnapshot.empty) {
+            alert("ไม่พบคำสั่งซื้อที่เกี่ยวข้อง");
+            return;
+          }
+
+          let orderDetails = "📦 คำสั่งซื้อของคุณ:\n\n";
+          let orderIndex = 1; // เริ่มนับที่ 1
+
+          querySnapshot.forEach((doc) => {
+            const order = doc.data();
+            const orderDate = order.timestamp?.toDate();
+            const formattedDate = orderDate ? orderDate.toLocaleDateString('th-TH') : "ไม่ระบุ";
+            const formattedTime = orderDate ? orderDate.toLocaleTimeString('th-TH') : "ไม่ระบุ";
+
+            orderDetails += `🛍 คำสั่งซื้อที่ ${orderIndex}\n`; // ใช้ orderIndex แทน index
+            orderDetails += `👤 ชื่อ: ${order.customerName || "ไม่ระบุ"}\n📞 เบอร์โทร: ${order.customerPhone}\n📅 วันที่: ${formattedDate} ⏰ เวลา: ${formattedTime}\n\n`;
+            orderDetails += `🛒 รายการสินค้า:\n`;
+
+            order.items.forEach((item) => {
+              const qty = Number(item.qty) || 0;
+              const price = Number(item.price) || 0;
+              const subtotal = item.subtotal ?? (qty * price);
+              orderDetails += `- ${item.name} (${qty} ชิ้น) ${price} บาท รวม ${subtotal} บาท\n`;
+            });
+
+            orderDetails += `\n💰 ยอดรวมทั้งหมด: ${order.totalPrice || "ไม่ระบุ"} บาท\n`;
+            orderDetails += "============================\n";
+
+            orderIndex++; // เพิ่มค่าลำดับคำสั่งซื้อ
+          });
+
+          showOrderDetailsInModal(orderDetails);
+
+        } catch (error) {
+          console.error("Error searching order:", error);
+          alert("ไม่สามารถค้นหาคำสั่งซื้อได้");
+        }
+      }
+
+      function showOrderDetailsInModal(orderDetails) {
+        document.getElementById("orderDetailsText").value = orderDetails;
+
+        const orderDetailsModal = new bootstrap.Modal(document.getElementById("orderDetailsModal"));
+        orderDetailsModal.show();
+      }
+
+      function isYouTubeLiveStream(url) {
+        const youtubeLivePatterns = [
+          /youtube\.com\/channel\/.*\/live/, // ลิงก์แบบ channel
+          /youtube\.com\/embed\/live_stream\?channel=.*/, // ลิงก์ embed ไลฟ์
+          /youtube\.com\/live\/.*/, // ลิงก์ live แบบ /live/...
+          /youtube\.com\/embed\/.*/, // ลิงก์ embed ที่ Firebase ส่งมา
+        ];
+        return youtubeLivePatterns.some((pattern) => pattern.test(url));
+      }
+
+      function getYouTubeEmbedUrl(videoUrl) {
+        try {
+          const url = new URL(videoUrl);
+
+          // ตรวจสอบลิงก์แบบ youtube.com/live/{VIDEO_ID}
+          if (
+            (url.hostname === "www.youtube.com" ||
+              url.hostname === "youtube.com") &&
+            url.pathname.startsWith("/live")
+          ) {
+            const videoId = url.pathname.split("/")[2]; // แยก VIDEO_ID ออกจาก URL
+            return `https://www.youtube.com/embed/${videoId}`;
+          }
+
+          // สำหรับลิงก์ youtube.com/watch?v={VIDEO_ID}
+          if (url.hostname === "www.youtube.com" && url.pathname === "/watch") {
+            const videoId = url.searchParams.get("v");
+            return `https://www.youtube.com/embed/${videoId}`;
+          }
+
+          // สำหรับลิงก์ youtu.be/{VIDEO_ID}
+          if (url.hostname === "youtu.be") {
+            const videoId = url.pathname.substring(1);
+            return `https://www.youtube.com/embed/${videoId}`;
+          }
+
+          // สำหรับลิงก์ช่องที่กำลังไลฟ์สด เช่น /channel/{CHANNEL_ID}
+          if (
+            url.hostname === "www.youtube.com" &&
+            url.pathname.startsWith("/channel")
+          ) {
+            const channelId = url.pathname.split("/")[2];
+            return `https://www.youtube.com/embed/live_stream?channel=${channelId}`;
+          }
+
+          console.warn("Unsupported YouTube URL format:", videoUrl);
+          return ""; // คืนค่าว่างหากไม่รองรับ
+        } catch (error) {
+          console.error("Error parsing video URL:", error);
+          return ""; // คืนค่าว่างในกรณีเกิดข้อผิดพลาด
+        }
+      }
+
+      async function loadVideo() {
+        try {
+          const doc = await db.collection("settings").doc("video").get();
+          const videoFrame = document.getElementById("videoFrame");
+          const localVideo = document.getElementById("localVideo");
+
+          if (doc.exists) {
+            const data = doc.data();
+            const videoUrl = data.url || "";
+
+            console.log("Video URL from Firebase:", videoUrl);
+
+            if (videoUrl && isYouTubeLiveStream(videoUrl)) {
+              videoFrame.src = videoUrl; // ใช้ URL ตรงจาก Firebase
+              videoFrame.style.display = "block";
+              localVideo.style.display = "none";
+              return;
+            } else {
+              console.warn("Invalid or unsupported video URL.");
+            }
+          }
+
+          // แสดงวิดีโอ faa9.mp4 หากไม่มีลิงก์หรือมีข้อผิดพลาด
+          console.warn("Falling back to local video.");
+          localVideo.style.display = "block";
+          videoFrame.style.display = "none";
+        } catch (error) {
+          console.error("Error loading video:", error);
+          localVideo.style.display = "block"; // แสดงวิดีโอในเครื่อง
+          videoFrame.style.display = "none";
+        }
+      }
+
+      function updateClock() {
+        const now = new Date();
+        const options = {
+          weekday: 'long',
+          year: 'numeric', month: 'long', day: 'numeric',
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+        };
+        const formattedTime = now.toLocaleDateString('th-TH', options);
+
+        document.getElementById('realTimeClock').textContent = `${formattedTime}`;
+      }
+
+      // อัปเดตทุก 1 วินาที
+      setInterval(updateClock, 1000);
+      updateClock(); // เรียกใช้งานครั้งแรก
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ตัดสต๊อกสินค้า</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0000009a;
+      margin: 5px;
+      padding: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 10px;
+    }
+
+    th,
+    td {
+      background-color: #f2f2f2;
+      border: 2px solid #000000;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #770505da;
+      color: azure;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #logContainer {
+      margin-top: 20px;
+      background-color: #f9f9f9;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    #logList {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    #logList li {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+
+    #logList li:last-child {
+      border-bottom: none;
+    }
+  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
+      authDomain: "jojutjan.firebaseapp.com",
+      projectId: "jojutjan",
+      storageBucket: "jojutjan.firebasestorage.app",
+      messagingSenderId: "1010237466401",
+      appId: "1:1010237466401:web:88855a3237647f1718c060",
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+</head>
+
+<body>
+  <h1>ตัดสต๊อก</h1>
+  <table id="stockTable">
+    <thead>
+      <tr>
+        <th>ชื่อ</th>
+        <th>ราคา</th>
+        <th>สต๊อกเริ่ม</th>
+        <th>เหลือ</th>
+        <th>ตัด</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- รายการสินค้าจะถูกเพิ่มโดย JavaScript -->
+    </tbody>
+  </table>
+  <button id="clearLogsBtn" onclick="clearLogs()">เคลียร์ข้อมูลบันทึก</button>
+  <button onclick="location.href='summary.html'">ดูสรุปรายการ</button>
+  <div id="logContainer">
+    <h2>บันทึกการตัด</h2>
+    <ul id="logList"></ul>
+  </div>
+
+  <script>
+    let stockData = []; // ข้อมูลสินค้าในหน้านี้
+
+    // แสดงรายการสินค้าในตาราง
+    function renderStockTable(items) {
+      const stockTableBody = document.querySelector("#stockTable tbody");
+      stockTableBody.innerHTML = "";
+
+      stockData = items.map((product, index) => {
+        const remainingQty = product.remainingQty ?? product.qty;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+      <td>${product.name}</td>
+      <td>${product.price} บาท</td>
+      <td>${product.qty}</td>
+      <td id="remaining-${index}">${remainingQty}</td>
+      <td>
+        <button id="deduct-btn-${index}" onclick="deductStock(${index})">ตัด</button>
+      </td>
+    `;
+        stockTableBody.appendChild(row);
+
+        return {
+          ...product,
+          remainingQty,
+          index
+        };
+      });
+    }
+
+    // โหลดข้อมูลแบบเรียลไทม์
+    function setupRealtimeStockUpdates() {
+      db.collection("mama")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .onSnapshot((snapshot) => {
+          if (!snapshot.empty) {
+            const latestDoc = snapshot.docs[0].data();
+            renderStockTable(latestDoc.items);
+          }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      try {
+        setupRealtimeStockUpdates();     // ✅ โหลดสินค้าแบบเรียลไทม์
+        loadLogsFromLocalStorage();      // ✅ โหลด log เก่าปกติ
+      } catch (error) {
+        console.error("Error initializing:", error);
+        alert("ไม่สามารถโหลดข้อมูลสินค้าได้");
+      }
+    });
+
+    // โหลดข้อมูลสินค้าจาก Firebase
+    async function loadProductsFromFirebase() {
+      const products = [];
+      try {
+        const querySnapshot = await db
+          .collection("mama")
+          .orderBy("timestamp", "desc")
+          .limit(1)
+          .onSnapshot()
+
+        if (!querySnapshot.empty) {
+          const latestDoc = querySnapshot.docs[0].data();
+          latestDoc.items.forEach((item) => {
+            products.push({
+              name: item.name,
+              price: item.price,
+              initialQty: item.qty, // ใช้ qty เป็นค่าเริ่มต้น
+              remainingQty: item.remainingQty ?? item.qty, // ใช้ remainingQty ถ้ามี หรือใช้ qty แทน
+              key: item.name, // ใช้ name เป็น key
+            });
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching products from Firebase:", error);
+      }
+      return products;
+    }
+
+    // ฟังก์ชันตัดสต๊อก
+    async function deductStock(index) {
+      const item = stockData[index]; // ดึงข้อมูลสินค้าจาก stockData
+
+      if (item.remainingQty > 0) {
+        item.remainingQty -= 1; // ลดจำนวนคงเหลือ
+
+        try {
+          // อัปเดตข้อมูลใน Firestore
+          await updateRemainingQtyInFirebase(item);
+
+          document.getElementById(`remaining-${index}`).textContent =
+            item.remainingQty;
+
+          // บันทึกการตัดใน stockLogs
+          await addToStockLogs({
+            name: item.name,
+            qty: 1, // จำนวนที่ตัด
+            price: item.price,
+            remainingQty: item.remainingQty,
+            action: "ตัดสินค้า", // ระบุประเภทการกระทำ
+          });
+        } catch (error) {
+          console.error("Error during stock deduction:", error);
+          alert("ไม่สามารถอัปเดตข้อมูลได้");
+        }
+      } else {
+        alert(`สินค้า "${item.name}" หมดสต๊อกแล้ว!`);
+      }
+    }
+
+    async function updateRemainingQtyInFirebase(item) {
+      const querySnapshot = await db
+        .collection("mama")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get();
+
+      if (!querySnapshot.empty) {
+        const latestDoc = querySnapshot.docs[0];
+        const docRef = latestDoc.ref;
+        const items = latestDoc.data().items;
+
+        // อัปเดตค่า remainingQty ของสินค้าที่ตรงกัน
+        const product = items.find((prod) => prod.name === item.name);
+        if (product) {
+          product.remainingQty = item.remainingQty;
+        }
+
+        await docRef.update({ items }); // อัปเดต Firestore
+      }
+    }
+
+    function loadStockLogs() {
+      const logList = document.getElementById("logList");
+      logList.innerHTML = ""; // ล้างรายการเก่า
+
+      db.collection("stockLogs")
+        .orderBy("timestamp", "desc") // เรียงข้อมูลจากล่าสุด
+        .onSnapshot(
+          (snapshot) => {
+            logList.innerHTML = ""; // ล้างรายการทุกครั้งที่มีการเปลี่ยนแปลง
+
+            if (snapshot.empty) {
+              logList.innerHTML = "<li>ไม่มีบันทึกการกระทำ</li>";
+              return;
+            }
+
+            snapshot.forEach((doc) => {
+              const log = doc.data();
+
+              // ตรวจสอบ timestamp ก่อนแปลง
+              const timestamp = log.timestamp
+                ? new Date(log.timestamp.seconds * 1000).toLocaleString()
+                : "ไม่ทราบเวลา";
+
+              const logEntry = document.createElement("li");
+
+              // แสดงข้อมูลที่บันทึก
+              logEntry.textContent = `(${timestamp}) 
+                    [${log.action}] สินค้า: "${log.name}", จำนวน: ${log.qty} ชิ้น, 
+                    ราคา: ${log.price} บาท, คงเหลือ: ${log.remainingQty} ชิ้น`;
+
+              logList.appendChild(logEntry);
+            });
+          },
+          (error) => {
+            console.error("Error listening to stock logs: ", error);
+          }
+        );
+    }
+    async function addToStockLogs(item) {
+      try {
+        await db.collection("stockLogs").add({
+          name: item.name,
+          qty: item.qty,
+          price: item.price,
+          remainingQty: item.remainingQty,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          action: item.action,
+        });
+        console.log("บันทึกข้อมูลการกระทำเรียบร้อย");
+      } catch (error) {
+        console.error("Error adding to stockLogs:", error);
+      }
+    }
+    document.addEventListener("DOMContentLoaded", loadStockLogs);
+    // ฟังก์ชันอัปเดตสต๊อกใน Firestore
+    async function updateStockInFirebase(item) {
+      const querySnapshot = await db
+        .collection("mama")
+        .orderBy("timestamp", "desc")
+        .limit(1)
+        .get();
+
+      if (!querySnapshot.empty) {
+        const latestDoc = querySnapshot.docs[0];
+        const docRef = latestDoc.ref;
+        const items = latestDoc.data().items;
+
+        const product = items.find((prod) => prod.name === item.name);
+        if (product) {
+          product.qty = item.remainingQty; // อัปเดตค่า qty ใน Firebase
+        }
+
+        await docRef.update({ items }); // อัปเดต Firestore
+      }
+    }
+    // เพิ่มบันทึกการตัด
+    function addLogEntry(itemName, remainingQty, price) {
+      const logList = document.getElementById("logList");
+      const logEntry = document.createElement("li");
+      const timestamp = new Date().toLocaleString();
+
+      // สร้างข้อความบันทึก
+      const logText = `(${timestamp}) ตัดสต๊อก "${itemName}" ราคา: ${price} บาท, จำนวน 1 ชิ้น, คงเหลือ: ${remainingQty} ชิ้น`;
+
+      // แสดงในหน้า
+      logEntry.textContent = logText;
+      logList.prepend(logEntry);
+
+      // เก็บใน LocalStorage
+      saveLogToLocalStorage(logText);
+    }
+    // เก็บบันทึกการตัดใน LocalStorage
+    function saveLogToLocalStorage(logText) {
+      const logs = JSON.parse(localStorage.getItem("stockLogs")) || [];
+      logs.unshift(logText);
+      localStorage.setItem("stockLogs", JSON.stringify(logs));
+    }
+    // โหลดบันทึกการตัดจาก LocalStorage
+    function loadLogsFromLocalStorage() {
+      const logs = JSON.parse(localStorage.getItem("stockLogs")) || [];
+      const logList = document.getElementById("logList");
+      logList.innerHTML = ""; // ล้างรายการเดิม
+      logs.forEach((log) => {
+        const logEntry = document.createElement("li");
+        logEntry.textContent = log;
+        logList.appendChild(logEntry);
+      });
+    }
+    async function clearLogs() {
+      if (confirm("ต้องการล้างข้อมูลบันทึกทั้งหมดหรือไม่?")) {
+        try {
+          // ดึงเอกสารทั้งหมดในคอลเลกชัน stockLogs
+          const querySnapshot = await db.collection("stockLogs").get();
+
+          // ลบเอกสารทีละรายการ
+          const batch = db.batch(); // ใช้ batch สำหรับการลบหลายรายการพร้อมกัน
+          querySnapshot.forEach((doc) => {
+            batch.delete(doc.ref); // ลบเอกสาร
+          });
+
+          await batch.commit(); // ดำเนินการลบทั้งหมด
+          alert("ล้างข้อมูลบันทึกเรียบร้อยแล้ว!");
+
+          // ล้างรายการในหน้าเว็บ
+          document.getElementById("logList").innerHTML = "";
+        } catch (error) {
+          console.error("Error clearing logs:", error);
+          alert("ไม่สามารถล้างข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
+        }
+      }
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>สรุปรายการสินค้า</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0000006e;
+      padding: 20px;
+      margin: 0;
+      overflow-x: hidden;
+      /* ปิดการเลื่อนด้านข้าง */
+    }
+
+    #captureArea {
+      background-color: rgba(255, 0, 0, 0.87);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(255, 255, 255, 0.863);
+      margin-bottom: 20px;
+      max-width: 100%;
+      overflow-x: hidden;
+      box-sizing: border-box;
+    }
+
+    table {
+      table-layout: fixed;
+      word-wrap: break-word;
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      word-wrap: break-word;
+      /* ห่อข้อความที่ยาว */
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #000000;
+      color: rgb(255, 0, 0);
+      font-weight: bold;
+    }
+
+    td {
+      background-color: #fcfcfc;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f2f2f2;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .total-bar {
+      font-size: 25px;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 20px;
+      background-color: #000000;
+      color: #ffffff;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .deduction-section {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .save-button {
+      background-color: #000000;
+      color: rgb(255, 0, 0);
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .save-button:hover {
+      background-color: #000000d3;
+      transform: scale(1.05);
+    }
+
+    .save-button:active {
+      transform: scale(0.95);
+    }
+
+    .container {
+      padding: 10px;
+      box-sizing: border-box;
+      width: 100%;
+      /* ให้คอนเทนเนอร์พอดีกับหน้าจอ */
+    }
+
+    label {
+      background-color: #ffffff;
+      color: #000000;
+      text-align: center;
+      border-radius: 5px;
+      width: 180px;
+    }
+
+    #totalSoldDisplay {
+      background-color: #000000;
+      color: rgb(255, 255, 255);
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    #orderTime {
+      text-align: center;
+      padding: 2px;
+      background-color: #f7f7f7;
+      border-radius: 5px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
+      authDomain: "jojutjan.firebaseapp.com",
+      projectId: "jojutjan",
+      storageBucket: "jojutjan.firebasestorage.app",
+      messagingSenderId: "1010237466401",
+      appId: "1:1010237466401:web:88855a3237647f1718c060",
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+</head>
+
+<body>
+  <h1>สรุปรายการสินค้า</h1>
+  <div id="captureArea">
+    <table>
+      <thead>
+        <tr>
+          <th>ชื่อ</th>
+          <th>ราคา</th>
+          <th>สต๊อกเริ่ม</th>
+          <th>ขายได้</th>
+          <th>เหลือ</th>
+          <th>เป็นเงิน</th>
+        </tr>
+      </thead>
+      <tbody id="summaryTableBody"></tbody>
+    </table>
+    <p id="orderTime">กำลังโหลด...</p>
+    <div id="totalSoldDisplay" class="totalSoldDisplay">ขายได้ทั้งหมด: 0 บาท</div>
+
+    <div class="deduction-section">
+      <label>
+        <input class="deductWage" type="checkbox" id="deductWage" /> หักค่าแรง 300 บาท
+      </label>
+      <label>
+        <input class="deductWages" type="checkbox" id="deductWages" /> หักค่าฝาก 15 บาท
+      </label>
+    </div>
+    <div id="totalSalesBar" class="total-bar">ยอดโอน: 0 บาท</div>
+  </div>
+
+  <div style="text-align: right; margin-top: 20px">
+    <button class="save-button" onclick="saveTableAsImage()">
+      บันทึกข้อมูลเป็นรูปภาพ
+    </button>
+  </div>
+
+  <script>
+    let totalSales = 0; // ตัวแปรเก็บยอดขายรวม
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const deductWageCheckbox = document.getElementById("deductWage");
+      const deductWagesCheckbox = document.getElementById("deductWages");
+
+      // เพิ่ม Event Listener ให้ทั้งสอง Checkbox
+      deductWageCheckbox.addEventListener("change", updateTotal);
+      deductWagesCheckbox.addEventListener("change", updateTotal);
+    });
+
+    function updateTotal() {
+      const deductWage = document.getElementById("deductWage").checked;
+      const deductWages = document.getElementById("deductWages").checked;
+      let finalTotal = totalSales;
+
+      if (deductWage) {
+        finalTotal -= 300;
+        if (finalTotal < 0) finalTotal = 0;
+      }
+      if (deductWages) {
+        finalTotal -= 15;
+        if (finalTotal < 0) finalTotal = 0;
+      }
+
+      // อัปเดตยอดขายทั้งหมด
+      document.getElementById("totalSalesBar").textContent = `ยอดโอน: ${parseInt(finalTotal)} บาท`;
+
+      // อัปเดตยอดขายได้ทั้งหมด (ก่อนหักค่าใช้จ่าย)
+      document.getElementById("totalSoldDisplay").textContent = `ขายได้ทั้งหมด: ${parseInt(totalSales)} บาท`;
+    }
+
+
+
+    async function loadProductsFromFirebase() {
+      const products = [];
+      try {
+        const querySnapshot = await db
+          .collection("mama")
+          .orderBy("timestamp", "desc")
+          .limit(1)
+          .get();
+
+        if (!querySnapshot.empty) {
+          const latestDoc = querySnapshot.docs[0].data();
+
+          // ✅ ดึงค่า timestamp
+          if (latestDoc.timestamp) {
+            const timestamp = latestDoc.timestamp;
+            const date = new Date(timestamp.seconds * 1000); // แปลง timestamp เป็น Date object
+            const formattedDate = date.toLocaleString("th-TH", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit"
+            });
+
+            // ✅ อัปเดตวันที่ลงในหน้าเว็บ
+            document.getElementById("orderTime").innerText = `วันที่ ${formattedDate}`;
+          }
+
+          latestDoc.items.forEach((item) => {
+            const name = item.name || "ไม่มีชื่อ";
+            const price = parseFloat(item.price) || 0;
+            const initialQty = parseInt(item.qty) || 0;
+            const remainingQty = parseInt(item.remainingQty ?? initialQty);
+
+            products.push({
+              name: name,
+              price: price,
+              initialQty: initialQty,
+              remainingQty: remainingQty,
+            });
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching products from Firebase:", error);
+        alert("ไม่สามารถโหลดข้อมูลสินค้าได้");
+      }
+      return products;
+    }
+
+    // ฟังก์ชันคำนวณและแสดงตารางสินค้า
+    document.addEventListener("DOMContentLoaded", async () => {
+      const tableBody = document.getElementById("summaryTableBody");
+
+      try {
+        const products = await loadProductsFromFirebase();
+        if (products.length === 0) {
+          tableBody.innerHTML =
+            "<tr><td colspan='6'>ไม่มีข้อมูลสินค้า</td></tr>";
+          return;
+        }
+
+        products.forEach((item) => {
+          const soldQty = item.initialQty - item.remainingQty; // จำนวนที่ขายได้
+          const totalPrice = soldQty * item.price; // ราคาที่ขายได้รวม
+
+          // ตรวจสอบให้แน่ใจว่า totalPrice เป็นตัวเลข
+          if (isNaN(totalPrice)) {
+            console.error(`Error: totalPrice is NaN for item: ${item.name}`);
+          }
+
+          totalSales += isNaN(totalPrice) ? 0 : totalPrice; // ตรวจสอบ totalPrice และไม่เพิ่มหากเป็น NaN
+
+          const row = `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.price} บ.</td>
+            <td>${item.initialQty}</td>
+            <td>${soldQty}</td>
+            <td>${item.remainingQty}</td>
+            <td>${isNaN(totalPrice) ? "0" : parseInt(totalPrice)
+            } บ.</td> <!-- ใช้ parseInt() แทน toFixed() -->
+          </tr>
+        `;
+          tableBody.innerHTML += row;
+        });
+
+        // อัปเดตยอดขายทั้งหมด
+        updateTotal();
+      } catch (error) {
+        console.error("Error loading summary data:", error);
+        alert("ไม่สามารถโหลดข้อมูลสินค้าได้");
+      }
+    });
+
+    // ฟังก์ชันบันทึกข้อมูลเป็นรูปภาพ
+    function saveTableAsImage() {
+      const captureElement = document.getElementById("captureArea");
+      captureElement.style.width = "100%";
+      captureElement.style.boxSizing = "border-box";
+
+      html2canvas(captureElement, { scrollX: 0, scrollY: 0, useCORS: true })
+        .then((canvas) => {
+          const link = document.createElement("a");
+          link.href = canvas.toDataURL("image/png");
+          link.download = "ยอดขาย.png";
+          link.click();
+        })
+        .catch((error) => {
+          console.error("เกิดข้อผิดพลาด:", error);
+          alert("ไม่สามารถบันทึกรูปภาพได้");
+        });
+    }
+
+    // ยังไม่ได้ใช้(เก็บไว้เพิ่ม)
+    async function saveToFirestore(data) {
+      try {
+        const docRef = await db.collection("mama").add({
+          items: data,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+        console.log("Document written with ID: ", docRef.id);
+        alert("ข้อมูลถูกบันทึกลงใน Firestore เรียบร้อยแล้ว!");
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+      }
+    }
+
+    // ฟังก์ชันบันทึกข้อมูลการสรุปลงใน Firestore
+    function logAndSaveSummaryData() {
+      const tableRows = document.querySelectorAll("#summaryTableBody tr");
+      const data = [];
+
+      tableRows.forEach((row) => {
+        const cells = row.querySelectorAll("td");
+        if (cells.length > 0) {
+          data.push({
+            name: cells[0].textContent.trim(),
+            price: cells[1].textContent.trim(),
+            initialQty: cells[2].textContent.trim(),
+            soldQty: cells[3].textContent.trim(),
+            remainingQty: cells[4].textContent.trim(),
+            total: cells[5].textContent.trim(),
+          });
+        }
+      });
+
+      console.log("ข้อมูลสรุปรายการสินค้า:", data);
+
+      saveToFirestore(data);
+    }
+
+  </script>
+</body>
+
+</html>
