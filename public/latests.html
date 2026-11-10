@@ -50,10 +50,94 @@
       text-align: center;
       /* จัดข้อความให้อยู่กึ่งกลาง */
     }
+    /* ===== แถบเมนูด้านบน ===== */
+
+/* ค่าเริ่มต้น = จอคอม/จอใหญ่: ปุ่มเรียงแนวนอน */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+.top-nav a {
+  flex: 0 1 180px;
+  padding: 10px 18px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ecf0f1;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: all 0.25s ease;
+}
+
+.top-nav a:active {
+  background: #16a085;
+}
+
+.top-nav a.active {
+  background: #1abc9c;
+  border-color: #1abc9c;
+  color: #fff;
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .top-nav a:hover {
+    background: #1abc9c;
+    border-color: #1abc9c;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(26, 188, 156, 0.4);
+  }
+}
+
+/* ===== มือถือและแท็บเล็ต (กว้างไม่เกิน 1024px): เรียงแนวตั้ง ===== */
+@media (max-width: 1024px) {
+  .top-nav {
+    position: static;            /* ไม่ตรึงบนจอ กันบังเนื้อหา */
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 10px;
+    margin: 8px;
+    padding: 14px 16px;
+    background: #34495e;
+    border-radius: 6px;
+  }
+
+  .top-nav a {
+    flex: none;                  /* ปุ่มกว้างเต็มแถว */
+    padding: 11px 16px;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .top-nav a:active {
+    transform: scale(0.97);
+  }
+}
   </style>
 </head>
 
 <body>
+  <nav class="top-nav">
+  <a href="latests.html" class="active">หลังบ้าน</a>
+  <a href="latest.html">เพิ่มสินค้า</a>
+  <a href="stoks.html">ตัดสต๊อกมือ</a>
+  <a href="summary.html">สรุปยอดขาย</a>
+</nav>
   <div class="container mt-5">
     <h2 class="text-center mb-4">จัดการลิงก์วิดีโอ</h2>
     <form id="videoLinkForm">
