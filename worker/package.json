@@ -1,0 +1,12 @@
+{
+  "name": "faa-shop-api",
+  "private": true,
+  "description": "Cloudflare Worker: Telegram order alerts and customer order lookup for order-in-store",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.162.0"
+  }
+}

@@ -1,0 +1,17 @@
+# Cloudflare Worker config (ค่าที่ไม่ใช่ความลับ)
+# ความลับ (TELEGRAM_TOKEN, TELEGRAM_CHAT_ID, BOT_EMAIL, BOT_PASSWORD) ตั้งด้วย `npx wrangler secret put <NAME>`
+# Secrets are set with `npx wrangler secret put <NAME>` and are never stored in this repo.
+name = "faa-shop-api"
+main = "src/index.js"
+compatibility_date = "2025-06-01"
+
+[vars]
+FIREBASE_PROJECT_ID = "jojutjan"
+# Firebase web API key: เป็นค่าสาธารณะอยู่แล้ว (อยู่ในหน้าเว็บ) ความปลอดภัยมาจาก Firestore rules
+FIREBASE_API_KEY = "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0"
+SITE_URL = "https://jojutjan.web.app"
+ALLOWED_ORIGINS = "https://jojutjan.web.app,https://jojutjan.firebaseapp.com"
+PREVIEW_ORIGIN_PATTERN = '^https://jojutjan--[a-z0-9-]+\.web\.app$'
+FIRESTORE_API = "https://firestore.googleapis.com"
+AUTH_API = "https://identitytoolkit.googleapis.com"
+TELEGRAM_API = "https://api.telegram.org"

@@ -248,6 +248,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="js/escape-html.js"></script>
+  <script src="js/shop-api.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
@@ -614,13 +615,10 @@
         }
 
         try {
-          const querySnapshot = await db
-            .collection("order")
-            .where("customerPhone", "==", customerPhone)
-            .orderBy("timestamp", "desc")
-            .get();
+          // ค้นผ่าน API ของร้าน: ฐานข้อมูลไม่เปิดให้อ่านออร์เดอร์โดยตรงแล้ว (ป้องกันข้อมูลลูกค้ารั่ว)
+          const orders = await findMyOrders(customerPhone);
 
-          if (querySnapshot.empty) {
+          if (orders.length === 0) {
             alert("ไม่พบคำสั่งซื้อที่เกี่ยวข้อง");
             return;
           }
@@ -628,9 +626,8 @@
           let orderDetails = "📦 คำสั่งซื้อของคุณ:\n\n";
           let orderIndex = 1; // เริ่มนับที่ 1
 
-          querySnapshot.forEach((doc) => {
-            const order = doc.data();
-            const orderDate = order.timestamp?.toDate();
+          orders.forEach((order) => {
+            const orderDate = order.timestamp ? new Date(order.timestamp) : null;
             const formattedDate = orderDate ? orderDate.toLocaleDateString('th-TH') : "ไม่ระบุ";
             const formattedTime = orderDate ? orderDate.toLocaleTimeString('th-TH') : "ไม่ระบุ";
 

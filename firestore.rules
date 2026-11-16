@@ -15,6 +15,17 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/staff/$(request.auth.uid));
     }
 
+    // บอทของ Cloudflare Worker (ส่ง Telegram + ค้นบิลให้ลูกค้า): บัญชีที่มีเอกสาร bots/{uid}
+    // สิทธิ์จำกัด: อ่านออร์เดอร์ และทำเครื่องหมาย notified ได้เท่านั้น
+    function isBot() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/bots/$(request.auth.uid));
+    }
+
+    match /bots/{uid} {
+      allow read, write: if false;
+    }
+
     // รายชื่อพนักงาน: แต่ละคนอ่านได้แค่เอกสารของตัวเอง แก้ไขได้จาก Console เท่านั้น
     match /staff/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
@@ -55,12 +66,20 @@ service cloud.firestore {
     match /orders/{orderId} {
       allow create: if isStaff() || isValidOrder();
       allow read, update, delete: if isStaff();
+      // บอท: อ่านออร์เดอร์ใหม่ และติ๊กว่าแจ้งเตือนแล้ว (แก้ช่องอื่นไม่ได้ ติ๊กซ้ำไม่ได้)
+      allow get: if isBot();
+      allow update: if isBot()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['notified'])
+        && request.resource.data.notified == true
+        && resource.data.get('notified', false) == false;
     }
 
     // ประวัติออร์เดอร์ทั้งหมด (สำเนาที่ไม่ถูกลบ)
     match /order/{orderId} {
       allow create: if isStaff() || isValidOrder();
       allow read, update, delete: if isStaff();
+      // บอท: ค้นประวัติออร์เดอร์ด้วยเบอร์โทร (ให้ลูกค้าดูบิลของตัวเองผ่าน Worker)
+      allow read: if isBot();
     }
 
     // บันทึกการตัดสต็อก: ลูกค้าเพิ่มได้เฉพาะบันทึก "สั่งซื้อ"

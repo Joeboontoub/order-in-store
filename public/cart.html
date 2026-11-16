@@ -197,6 +197,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="js/escape-html.js"></script>
+  <script src="js/shop-api.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
@@ -369,55 +370,11 @@
           alert("เกิดข้อผิดพลาดในการสั่งซื้อ");
         });
     }
-    async function sendTelegramMessageFromCart(order, orderId = "-") {
-      const token = "8197665346:AAE2rXhq057hDUW1ELXDdFG18fPsgyRb5oA";
-      const chatId = "7470108466";
-
-      const itemsText = order.items.map(item =>
-        `📌 ${item.name} (฿${item.price} x ${item.qty}) = ฿${item.subtotal}`
-      ).join("\n");
-
-      const timestamp = new Date().toLocaleString("th-TH", {
-        timeZone: "Asia/Bangkok",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).replace(",", "");
-
-      const message =
-        `📝 *คำสั่งซื้อหน้าร้านใหม่!*
-━━━━━━━━━━━━━━━━━━
-🔹 Order ID: ${orderId}
-👤 ลูกค้า: ${order.customerName} (${order.customerPhone})
-━━━━━━━━━━━━━━━━━━
-📦 รายการสินค้า: 
-${itemsText}
-━━━━━━━━━━━━━━━━━━
-💰 ยอดรวม: ฿${order.totalPrice.toFixed(2)}
-━━━━━━━━━━━━━━━━━━
-⏰ เวลาที่สั่ง: ${timestamp}
-━━━━━━━━━━━━━━━━━━
-🌳 jojutjan: https://jojutjan.web.app/latests.html`;
-
-      const payload = {
-        chat_id: chatId,
-        text: message,
-        parse_mode: "Markdown"
-      };
-
+    // แจ้งเตือน Telegram ผ่าน API ของร้าน (token อยู่ฝั่งเซิร์ฟเวอร์ ไม่อยู่ในหน้าเว็บแล้ว)
+    // ถ้าแจ้งไม่สำเร็จ ออร์เดอร์ยังถูกบันทึกตามปกติ และยังเห็นได้ในหน้าหลังบ้าน
+    async function sendTelegramMessageFromCart(order, orderId) {
       try {
-        const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-        if (!result.ok) {
-          console.error("❌ Telegram ส่งไม่สำเร็จ:", result);
-        }
+        await notifyNewOrder(orderId);
       } catch (error) {
         console.error("❌ ส่ง Telegram ล้มเหลว:", error);
       }
