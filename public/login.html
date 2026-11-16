@@ -39,21 +39,14 @@
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="js/firebase-config.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
-      authDomain: "jojutjan.firebaseapp.com",
-      projectId: "jojutjan",
-      storageBucket: "jojutjan.firebasestorage.app",
-      messagingSenderId: "1010237466401",
-      appId: "1:1010237466401:web:88855a3237647f1718c060",
-    };
     firebase.initializeApp(firebaseConfig);
 
     // หน้าที่จะกลับไปหลังล็อกอิน: รับเฉพาะชื่อไฟล์หน้าพนักงาน (กัน open redirect ไปเว็บอื่น)
-    const STAFF_PAGES = ["latest.html", "latests.html", "stoks.html", "summary.html"];
+    const STAFF_PAGES = ["products.html", "orders.html", "stock.html", "summary.html"];
     const params = new URLSearchParams(window.location.search);
-    const next = STAFF_PAGES.includes(params.get("next")) ? params.get("next") : "latests.html";
+    const next = STAFF_PAGES.includes(params.get("next")) ? params.get("next") : "orders.html";
 
     const message = document.getElementById("message");
     function showMessage(text, type) {

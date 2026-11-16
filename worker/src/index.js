@@ -107,7 +107,7 @@ function orderMessage(orderId, order, env) {
     "📦 รายการสินค้า:", items, line,
     `💰 ยอดรวม: ฿${Number(order.totalPrice).toFixed(2)}`, line,
     `⏰ เวลาที่สั่ง: ${time}`, line,
-    `🌳 ${env.SITE_URL}/latests.html`,
+    `🌳 ${env.SITE_URL}/orders.html`,
   ].join("\n");
 }
 

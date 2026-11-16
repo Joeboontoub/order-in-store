@@ -19,6 +19,23 @@
           }
         ]
       }
+    ],
+    "redirects": [
+      {
+        "source": "/latests.html",
+        "destination": "/orders.html",
+        "type": 301
+      },
+      {
+        "source": "/latest.html",
+        "destination": "/products.html",
+        "type": 301
+      },
+      {
+        "source": "/stoks.html",
+        "destination": "/stock.html",
+        "type": 301
+      }
     ]
   },
   "emulators": {

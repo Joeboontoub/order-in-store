@@ -419,18 +419,10 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="js/firebase-config.js"></script>
   <script src="js/escape-html.js"></script>
   <script src="js/staff-auth.js"></script>
   <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
-      authDomain: "jojutjan.firebaseapp.com",
-      projectId: "jojutjan",
-      storageBucket: "jojutjan.firebasestorage.app",
-      messagingSenderId: "1010237466401",
-      appId: "1:1010237466401:web:88855a3237647f1718c060",
-    };
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
@@ -441,9 +433,9 @@
 
 <body>
   <nav class="top-nav">
-  <a href="latests.html">หลังบ้าน</a>
-  <a href="latest.html" class="active">เพิ่มสินค้า</a>
-  <a href="stoks.html">ตัดสต๊อกมือ</a>
+  <a href="orders.html">หลังบ้าน</a>
+  <a href="products.html" class="active">เพิ่มสินค้า</a>
+  <a href="stock.html">ตัดสต๊อกมือ</a>
   <a href="summary.html">สรุปยอดขาย</a>
 </nav>
   <h2>รายการสินค้า</h2>

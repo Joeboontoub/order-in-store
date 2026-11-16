@@ -15,7 +15,7 @@
   let staffReady = null;
 
   function goToLogin(reason) {
-    const page = window.location.pathname.split("/").pop() || "latests.html";
+    const page = window.location.pathname.split("/").pop() || "orders.html";
     const params = new URLSearchParams({ next: page });
     if (reason) params.set("reason", reason);
     window.location.replace("login.html?" + params.toString());

@@ -300,7 +300,7 @@ html body .staff-bar button {
 }
 html body .staff-bar button:hover { background: var(--danger); border-color: var(--danger); }
 
-/* หน้าต่างรายละเอียดออร์เดอร์ (latests.html ใช้ id="joe" กับกล่องและตาราง) */
+/* หน้าต่างรายละเอียดออร์เดอร์ (orders.html ใช้ id="joe" กับกล่องและตาราง) */
 html body .modal-body#joe,
 html body table#joe {
   background: var(--surface);
@@ -308,7 +308,7 @@ html body table#joe {
   border: 1px solid var(--border);
 }
 
-/* ช่องเลือกรูปสินค้า (latest.html) */
+/* ช่องเลือกรูปสินค้า (products.html) */
 html body .item-image-name { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
 
 /* มือถือ: ตารางสรุปยอดและตัดสต็อกให้ตัวเลขไม่ตกบรรทัด */
