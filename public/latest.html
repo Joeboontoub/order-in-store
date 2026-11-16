@@ -418,7 +418,9 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="js/escape-html.js"></script>
+  <script src="js/staff-auth.js"></script>
   <script>
     // Firebase configuration
     const firebaseConfig = {
@@ -920,7 +922,7 @@
         });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    onStaffReady(() => {
       fetchLatestData(); // ดึงข้อมูลล่าสุดจาก Firestore
       loadItemsFromFirebase(); // ดึงข้อมูลจาก Firebase และแสดงในฟอร์ม
     });

@@ -1,19 +1,82 @@
 rules_version = '2';
 
+// กฎความปลอดภัยของ Firestore สำหรับร้าน Faa Homemade
+// - ลูกค้า (ไม่ล็อกอิน): ดูสินค้า/สต็อก, สั่งซื้อ (สร้างออร์เดอร์ได้อย่างเดียว อ่านออร์เดอร์ของคนอื่นไม่ได้)
+// - พนักงาน: บัญชี Firebase Auth ที่มีเอกสาร staff/{uid} (เจ้าของร้านเพิ่มเองใน Firebase Console)
+//
+// Firestore security rules
+// - Customers (not signed in): read products/stock and create orders only; they cannot read anyone's orders.
+// - Staff: a Firebase Auth user that has a staff/{uid} document (added by the owner in the console).
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
+    function isStaff() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/staff/$(request.auth.uid));
+    }
+
+    // รายชื่อพนักงาน: แต่ละคนอ่านได้แค่เอกสารของตัวเอง แก้ไขได้จาก Console เท่านั้น
+    match /staff/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // สินค้าและสต็อก (ทุกคนดูได้)
+    // ลูกค้าตัดสต็อกตอนสั่งซื้อได้: แก้ได้เฉพาะช่อง items และจำนวนสินค้าในรายการต้องเท่าเดิม
+    // (การตรวจละเอียดรายสินค้าต้องทำฝั่งเซิร์ฟเวอร์ ซึ่งจะย้ายไปในขั้นถัดไป)
+    match /mama/{docId} {
+      allow read: if true;
+      allow create, delete: if isStaff();
+      allow update: if isStaff() || (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['items'])
+        && request.resource.data.items is list
+        && request.resource.data.items.size() == resource.data.items.size()
+      );
+    }
+
+    // ลิงก์วิดีโอ/ไลฟ์สดที่แสดงหน้าร้าน
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    function isValidOrder() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['customerName', 'customerPhone', 'items', 'totalPrice', 'timestamp'])
+        && d.keys().hasAll(['customerName', 'customerPhone', 'items', 'totalPrice', 'timestamp'])
+        && d.customerName is string && d.customerName.size() > 0 && d.customerName.size() <= 100
+        && d.customerPhone is string && d.customerPhone.size() > 0 && d.customerPhone.size() <= 20
+        && d.items is list && d.items.size() > 0 && d.items.size() <= 50
+        && d.totalPrice is number && d.totalPrice >= 0
+        && d.timestamp == request.time;
+    }
+
+    // ออร์เดอร์ที่ร้านต้องจัดการ (พนักงานลบได้หลังทำเสร็จ)
+    match /orders/{orderId} {
+      allow create: if isStaff() || isValidOrder();
+      allow read, update, delete: if isStaff();
+    }
+
+    // ประวัติออร์เดอร์ทั้งหมด (สำเนาที่ไม่ถูกลบ)
+    match /order/{orderId} {
+      allow create: if isStaff() || isValidOrder();
+      allow read, update, delete: if isStaff();
+    }
+
+    // บันทึกการตัดสต็อก: ลูกค้าเพิ่มได้เฉพาะบันทึก "สั่งซื้อ"
+    match /stockLogs/{logId} {
+      allow create: if isStaff() || (
+        request.resource.data.keys().hasOnly(['name', 'qty', 'price', 'remainingQty', 'timestamp', 'action'])
+        && request.resource.data.action == 'สั่งซื้อ'
+        && request.resource.data.name is string && request.resource.data.name.size() <= 100
+        && request.resource.data.timestamp == request.time
+      );
+      allow read, update, delete: if isStaff();
+    }
+
+    // อย่างอื่นทั้งหมด: ปฏิเสธ
     match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2024, 12, 29);
+      allow read, write: if false;
     }
   }
 }

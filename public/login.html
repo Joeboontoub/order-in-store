@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เข้าสู่ระบบพนักงาน</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+  <style>
+    body { background-color: #4a637c; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .login-card { width: 100%; max-width: 380px; border-radius: 14px; }
+  </style>
+</head>
+
+<body>
+  <div class="card login-card shadow">
+    <div class="card-body p-4">
+      <h1 class="h4 text-center mb-1">🥪 เข้าสู่ระบบพนักงาน</h1>
+      <p class="text-center text-muted small mb-4">สำหรับหน้าขาย จัดการออร์เดอร์ ตัดสต็อก และสรุปยอด</p>
+
+      <div id="message" class="alert d-none" role="alert"></div>
+
+      <form id="loginForm" novalidate>
+        <div class="mb-3">
+          <label for="email" class="form-label">อีเมล</label>
+          <input type="email" id="email" class="form-control" autocomplete="username" required />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">รหัสผ่าน</label>
+          <input type="password" id="password" class="form-control" autocomplete="current-password" required />
+        </div>
+        <button type="submit" id="loginButton" class="btn btn-primary w-100">เข้าสู่ระบบ</button>
+      </form>
+
+      <p class="text-center mt-3 mb-0"><a href="index.html" class="small">← กลับหน้าร้าน</a></p>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
+      authDomain: "jojutjan.firebaseapp.com",
+      projectId: "jojutjan",
+      storageBucket: "jojutjan.firebasestorage.app",
+      messagingSenderId: "1010237466401",
+      appId: "1:1010237466401:web:88855a3237647f1718c060",
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    // หน้าที่จะกลับไปหลังล็อกอิน: รับเฉพาะชื่อไฟล์หน้าพนักงาน (กัน open redirect ไปเว็บอื่น)
+    const STAFF_PAGES = ["latest.html", "latests.html", "stoks.html", "summary.html"];
+    const params = new URLSearchParams(window.location.search);
+    const next = STAFF_PAGES.includes(params.get("next")) ? params.get("next") : "latests.html";
+
+    const message = document.getElementById("message");
+    function showMessage(text, type) {
+      message.textContent = text;
+      message.className = "alert alert-" + type;
+    }
+
+    if (params.get("reason") === "not-staff") {
+      showMessage("บัญชีนี้ยังไม่ได้รับสิทธิ์พนักงาน", "warning");
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      if (!email || !password) {
+        showMessage("กรุณากรอกอีเมลและรหัสผ่าน", "warning");
+        return;
+      }
+
+      const button = document.getElementById("loginButton");
+      button.disabled = true;
+      button.textContent = "กำลังเข้าสู่ระบบ...";
+      try {
+        await firebase.auth().signInWithEmailAndPassword(email, password);
+        window.location.replace(next);
+      } catch (error) {
+        const tooMany = error.code === "auth/too-many-requests";
+        showMessage(tooMany ? "ลองผิดหลายครั้งเกินไป กรุณารอสักครู่แล้วลองใหม่" : "อีเมลหรือรหัสผ่านไม่ถูกต้อง", "danger");
+        button.disabled = false;
+        button.textContent = "เข้าสู่ระบบ";
+      }
+    });
+  </script>
+</body>
+
+</html>

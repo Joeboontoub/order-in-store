@@ -148,7 +148,9 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="js/escape-html.js"></script>
+  <script src="js/staff-auth.js"></script>
   <script>
     // Firebase configuration
     const firebaseConfig = {
@@ -239,7 +241,7 @@
         });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    onStaffReady(() => {
       try {
         setupRealtimeStockUpdates();     // ✅ โหลดสินค้าแบบเรียลไทม์
         loadLogsFromLocalStorage();      // ✅ โหลด log เก่าปกติ
@@ -383,7 +385,7 @@
         console.error("Error adding to stockLogs:", error);
       }
     }
-    document.addEventListener("DOMContentLoaded", loadStockLogs);
+    onStaffReady(loadStockLogs);
     // ฟังก์ชันอัปเดตสต๊อกใน Firestore
     async function updateStockInFirebase(item) {
       const querySnapshot = await db
