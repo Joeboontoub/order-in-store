@@ -1,6 +1,6 @@
 // เรียก API ของร้าน (Cloudflare Worker ในโฟลเดอร์ worker/) ซึ่งเก็บ token Telegram ไว้ฝั่งเซิร์ฟเวอร์
 // Calls the shop API (Cloudflare Worker in worker/) that keeps the Telegram token server-side.
-const SHOP_API_URL = window.SHOP_API_URL || "https://faa-shop-api.WORKERS_SUBDOMAIN.workers.dev";
+const SHOP_API_URL = window.SHOP_API_URL || "https://faa-shop-api.faahomemade.workers.dev";
 
 async function shopApi(path, body) {
   const res = await fetch(SHOP_API_URL + path, {
