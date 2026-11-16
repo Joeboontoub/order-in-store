@@ -418,6 +418,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="js/escape-html.js"></script>
   <script>
     // Firebase configuration
     const firebaseConfig = {
@@ -479,13 +480,13 @@
       const div = document.createElement("div");
       div.className = "custom-item";
       div.innerHTML = `
-    <input type="text" placeholder="ชื่อรายการ" class="item-name" value="${name}">
-    <input type="number" placeholder="จำนวน" class="item-qty" min="0" value="${qty}">
-    <input type="number" placeholder="ราคา" class="item-price" min="0" value="${price}">
+    <input type="text" placeholder="ชื่อรายการ" class="item-name" value="${escapeHtml(name)}">
+    <input type="number" placeholder="จำนวน" class="item-qty" min="0" value="${escapeHtml(qty)}">
+    <input type="number" placeholder="ราคา" class="item-price" min="0" value="${escapeHtml(price)}">
     <select class="item-image-name">
       <option value="">เลือกชื่อรูปภาพ</option>
     </select>
-    <img src="${imageName || ""
+    <img src="${escapeHtml(imageName || "")
         }" alt="Preview" class="image-preview" style="width:50px; height:auto; display:${imageName ? "block" : "none"
         };">
   `;
@@ -665,11 +666,11 @@
 
         return `
       <tr>
-        <td>${name}</td>
-        <td>${qty}</td>
-        <td>${price}</td>
-        <td>${sum}</td>
-        <td><img src="${imageUrl}" alt="Image" style="width:50px; height:auto;"></td>
+        <td>${escapeHtml(name)}</td>
+        <td>${escapeHtml(qty)}</td>
+        <td>${escapeHtml(price)}</td>
+        <td>${escapeHtml(sum)}</td>
+        <td><img src="${escapeHtml(imageUrl)}" alt="Image" style="width:50px; height:auto;"></td>
       </tr>`;
       });
 
@@ -736,7 +737,7 @@
           const docLi = document.createElement("li");
           docLi.innerHTML = `
         <label>
-          <input type="checkbox" class="document-checkbox" data-doc-id="${doc.id}" />
+          <input type="checkbox" class="document-checkbox" data-doc-id="${escapeHtml(doc.id)}" />
           ${formattedTimestamp} (${items.length} รายการ)
         </label>`;
           documentList.appendChild(docLi);
@@ -745,8 +746,8 @@
             const itemLi = document.createElement("li");
             itemLi.innerHTML = `
           <label>
-            <input type="checkbox" class="item-checkbox" data-doc-id="${doc.id}" data-item-index="${index}" />
-            ${item.name} - จำนวน: ${item.qty}, ราคา: ${item.price}
+            <input type="checkbox" class="item-checkbox" data-doc-id="${escapeHtml(doc.id)}" data-item-index="${index}" />
+            ${escapeHtml(item.name)} - จำนวน: ${escapeHtml(item.qty)}, ราคา: ${escapeHtml(item.price)}
           </label>`;
             itemList.appendChild(itemLi);
           });
@@ -894,11 +895,11 @@
               total += sum;
               return `
             <tr>
-              <td>${item.name}</td>
-              <td>${item.qty}</td>
-              <td>${item.price}</td>
-              <td>${sum}</td>
-              <td><img src="${item.imageUrl || 'images/9.jpg'}" alt="Image" style="width:50px; height:auto;"></td>
+              <td>${escapeHtml(item.name)}</td>
+              <td>${escapeHtml(item.qty)}</td>
+              <td>${escapeHtml(item.price)}</td>
+              <td>${escapeHtml(sum)}</td>
+              <td><img src="${escapeHtml(item.imageUrl || 'images/9.jpg')}" alt="Image" style="width:50px; height:auto;"></td>
             </tr>
           `;
             });

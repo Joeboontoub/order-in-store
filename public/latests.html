@@ -240,6 +240,7 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="js/escape-html.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
@@ -304,12 +305,11 @@
               (order, index) => ` 
         <tr>
           <td>${index + 1}</td>
-          <td>${order.date}</td>
-          <td>${order.customerName}</td>
-          <td>${order.totalPrice}</td>
+          <td>${escapeHtml(order.date)}</td>
+          <td>${escapeHtml(order.customerName)}</td>
+          <td>${escapeHtml(order.totalPrice)}</td>
           <td>
-            <button class="btn btn-info btn-sm" onclick="viewDetails('${order.id
-                }')">ดูรายละเอียด</button>
+            <button class="btn btn-info btn-sm" data-order-id="${escapeHtml(order.id)}" onclick="viewDetails(this.dataset.orderId)">ดูรายละเอียด</button>
           </td>
         </tr>
       `
@@ -363,10 +363,10 @@
           .map(
             (item) => `
       <tr>
-        <td>${item.name}</td>
-        <td>${item.qty}</td>
-        <td>${item.price}</td>
-        <td>${item.subtotal}</td>
+        <td>${escapeHtml(item.name)}</td>
+        <td>${escapeHtml(item.qty)}</td>
+        <td>${escapeHtml(item.price)}</td>
+        <td>${escapeHtml(item.subtotal)}</td>
       </tr>
     `
           )
@@ -517,7 +517,7 @@
 
         if (doc.exists) {
           const data = doc.data();
-          savedLink.innerHTML = `<a href="${data.url}" target="_blank">${data.url}</a>`;
+          savedLink.innerHTML = `<a href="${escapeHtml(safeUrl(data.url))}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.url)}</a>`;
           document.getElementById("videoLink").value = data.url || "";
         } else {
           savedLink.textContent = "ไม่มีข้อมูล";

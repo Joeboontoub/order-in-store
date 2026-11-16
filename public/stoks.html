@@ -148,6 +148,7 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="js/escape-html.js"></script>
   <script>
     // Firebase configuration
     const firebaseConfig = {
@@ -207,10 +208,10 @@
 
         const row = document.createElement("tr");
         row.innerHTML = `
-      <td>${product.name}</td>
-      <td>${product.price} บาท</td>
-      <td>${product.qty}</td>
-      <td id="remaining-${index}">${remainingQty}</td>
+      <td>${escapeHtml(product.name)}</td>
+      <td>${escapeHtml(product.price)} บาท</td>
+      <td>${escapeHtml(product.qty)}</td>
+      <td id="remaining-${index}">${escapeHtml(remainingQty)}</td>
       <td>
         <button id="deduct-btn-${index}" onclick="deductStock(${index})">ตัด</button>
       </td>

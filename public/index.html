@@ -247,6 +247,7 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="js/escape-html.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDfTFhwCW7pcyj06oqxeMyzwHqWPNRJ8e0",
@@ -398,16 +399,16 @@
               // แสดงรายการสินค้า
               productTable.innerHTML = stockData.map((product, index) => `
           <tr>
-            <td class="name-cell" data-fullname="${product.name} ${product.description}">
-              ${product.name.length > 15 ? product.name.substring(0, 15) + "..." : product.name}
+            <td class="name-cell" data-fullname="${escapeHtml(product.name)} ${escapeHtml(product.description)}">
+              ${escapeHtml(product.name.length > 15 ? product.name.substring(0, 15) + "..." : product.name)}
             </td>
             <td>
-              <img src="${product.imageUrl || 'images/9.jpg'}" alt="${product.name}" style="max-width:40px; max-height:50px;" class="popup-trigger">
+              <img src="${escapeHtml(product.imageUrl || 'images/9.jpg')}" alt="${escapeHtml(product.name)}" style="max-width:40px; max-height:50px;" class="popup-trigger">
             </td>
-            <td>${product.price} ฿</td>
+            <td>${escapeHtml(product.price)} ฿</td>
             <td id="remaining-${index}" class="${getBorderClass(product.adjustedRemainingQty)}">
-  ${product.adjustedRemainingQty} ชิ้น</td>
-            <td><input type="number" id="qty-${index}" min="1" max="${product.remainingQty}" class="form-control"></td>
+  ${escapeHtml(product.adjustedRemainingQty)} ชิ้น</td>
+            <td><input type="number" id="qty-${index}" min="1" max="${escapeHtml(product.remainingQty)}" class="form-control"></td>
           </tr>
         `).join("");
 

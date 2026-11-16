@@ -216,6 +216,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="js/escape-html.js"></script>
   <script>
     // Firebase configuration
     const firebaseConfig = {
@@ -385,11 +386,11 @@
 
           const row = `
           <tr>
-            <td>${item.name}</td>
-            <td>${item.price} บ.</td>
-            <td>${item.initialQty}</td>
-            <td>${soldQty}</td>
-            <td>${item.remainingQty}</td>
+            <td>${escapeHtml(item.name)}</td>
+            <td>${escapeHtml(item.price)} บ.</td>
+            <td>${escapeHtml(item.initialQty)}</td>
+            <td>${escapeHtml(soldQty)}</td>
+            <td>${escapeHtml(item.remainingQty)}</td>
             <td>${isNaN(totalPrice) ? "0" : parseInt(totalPrice)
             } บ.</td> <!-- ใช้ parseInt() แทน toFixed() -->
           </tr>
