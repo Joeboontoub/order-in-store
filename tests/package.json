@@ -1,0 +1,13 @@
+{
+  "name": "order-in-store-tests",
+  "private": true,
+  "type": "module",
+  "description": "Firestore security rules tests (run against the local emulator, never the real database)",
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore --project demo-jojutjan \"node shop-rules.test.mjs && node bot-rules.test.mjs\""
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "firebase": "^13.3.0"
+  }
+}
