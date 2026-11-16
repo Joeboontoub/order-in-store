@@ -1,0 +1,324 @@
+/* =========================================================================
+   ธีมกลางของหน้าร้านและหลังบ้าน (ทุกหน้า ยกเว้น index.html)
+   Shared dark theme: black, dark brown and white.
+   โหลดไฟล์นี้เป็นอันสุดท้ายใน <head> เพื่อทับสีเดิมของแต่ละหน้า
+   ========================================================================= */
+@import url("https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap");
+
+:root {
+  --bg: #120e0c;            /* พื้นหลัง: ดำอมน้ำตาล */
+  --surface: #1f1813;       /* การ์ด/กล่อง: น้ำตาลเข้ม */
+  --surface-2: #2a2019;     /* แถวตารางสลับ / ช่องกรอก */
+  --surface-3: #3a2c22;     /* hover */
+  --border: #4b3a2d;
+  --brown: #7a5232;         /* ปุ่มหลัก */
+  --brown-hover: #8f6240;
+  --brown-light: #c8a07a;   /* หัวข้อ/ตัวเน้น */
+  --text: #f5efe9;          /* ตัวอักษรขาวนวล */
+  --text-muted: #bfae9f;
+  --danger: #9b2c2c;
+  --danger-hover: #b33a3a;
+  --radius: 12px;
+}
+
+/* ---------- พื้นฐาน ---------- */
+html body {
+  background: var(--bg) !important;
+  background-image: none !important;
+  filter: none !important;
+  color: var(--text);
+  font-family: "Prompt", "Segoe UI", Arial, sans-serif;
+  margin: 0;
+  padding: 0 16px 32px;
+  min-height: 100vh;
+}
+html body h1,
+html body h2,
+html body h3,
+html body h4,
+html body h5,
+html body h6 {
+  color: var(--text);
+  font-weight: 600;
+  text-shadow: none;
+  border: none;
+}
+html body h1,
+html body h2 {
+  color: var(--brown-light);
+  text-align: center;
+  margin: 24px 0 16px;
+}
+html body a { color: var(--brown-light); }
+html body label,
+html body .form-label { color: var(--text-muted); font-weight: 500; }
+html body .text-muted,
+html body #message h1,
+html body #message h3,
+html body #message p { color: var(--text-muted) !important; }
+html body #message a { background: var(--brown); color: #fff; }
+html body hr { border-color: var(--border); opacity: 1; }
+
+/* ---------- เมนูด้านบน (หน้าพนักงาน) ---------- */
+html body .top-nav {
+  margin: 0 -16px 8px;
+  background: #0b0908;
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  /* เว้นที่ด้านขวาให้แถบชื่อผู้ใช้/ออกจากระบบ */
+  padding-right: 150px;
+}
+html body .top-nav a {
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+html body .top-nav a.active,
+html body .top-nav a:active {
+  background: var(--brown);
+  border-color: var(--brown);
+  color: #fff;
+}
+@media (hover: hover) {
+  html body .top-nav a:hover {
+    background: var(--brown-hover);
+    border-color: var(--brown-hover);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(122, 82, 50, 0.45);
+  }
+}
+@media (max-width: 1024px) {
+  html body .top-nav {
+    margin: 8px 0;
+    padding: 56px 14px 14px; /* มือถือ: แถบผู้ใช้อยู่ด้านบนของเมนู */
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  html body .top-nav a { background: var(--surface-2); }
+}
+
+/* ---------- กล่อง/การ์ด ---------- */
+html body .container,
+html body #captureArea,
+html body #logContainer,
+html body #customItems,
+html body #results,
+html body .modal-content,
+html body .card,
+html body #message,
+html body #clearPopup {
+  background: var(--surface) !important;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+html body .container { padding: 20px; margin-top: 16px; margin-bottom: 16px; }
+html body .modal-header,
+html body .modal-footer { border-color: var(--border); }
+html body .btn-close { filter: invert(1) grayscale(1); }
+html body .custom-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+/* ---------- ตาราง ---------- */
+html body table,
+html body .table {
+  --bs-table-bg: var(--surface);
+  --bs-table-color: var(--text);
+  --bs-table-striped-bg: var(--surface-2);
+  --bs-table-striped-color: var(--text);
+  --bs-table-hover-bg: var(--surface-3);
+  --bs-table-border-color: var(--border);
+  color: var(--text);
+  border-color: var(--border);
+  border-collapse: collapse;
+}
+html body th,
+html body .table th,
+html body .table-dark th,
+html body #joe th {
+  background: #0b0908 !important;
+  color: var(--brown-light) !important;
+  border: 1px solid var(--border) !important;
+  font-weight: 600;
+  text-transform: none;
+}
+html body td,
+html body .table td {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0;
+}
+html body tr:nth-child(even) td,
+html body .table tr:nth-child(even) td { background: var(--surface-2) !important; }
+html body .date-header {
+  background: #0b0908;
+  color: var(--brown-light);
+  border: 1px solid var(--border);
+}
+
+/* ---------- ปุ่ม ---------- */
+html body button,
+html body .btn,
+html body .btn-primary,
+html body .btn-info,
+html body .btn-success,
+html body .save-button,
+html body #joe.btn,
+html body button#joe,
+html body #saveImageBtn,
+html body .btn-btn-secondary,
+html body .toggle-btn {
+  background: var(--brown);
+  color: #fff;
+  border: 1px solid var(--brown);
+  border-radius: 10px;
+  font-weight: 500;
+  box-shadow: none;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+html body button:hover,
+html body .btn:hover,
+html body .save-button:hover,
+html body #saveImageBtn:hover,
+html body button#joe:hover {
+  background: var(--brown-hover);
+  border-color: var(--brown-hover);
+  color: #fff;
+}
+html body button:active,
+html body .btn:active { transform: scale(0.97); }
+
+/* ปุ่มรอง */
+html body .btn-secondary,
+html body .close-btn,
+html body .btn-btn-secondary,
+html body .toggle-btn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--text-muted);
+}
+html body .btn-secondary:hover,
+html body .close-btn:hover,
+html body .toggle-btn:hover { background: var(--surface-3); color: #fff; }
+
+/* ปุ่มที่ลบข้อมูล: แดงเข้ม เพื่อให้เห็นชัดว่าอันตราย */
+html body .btn-danger,
+html body .delete-btn,
+html body #faa,
+html body #clearLogsBtn {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+html body .btn-danger:hover,
+html body .delete-btn:hover,
+html body #faa:hover,
+html body #clearLogsBtn:hover { background: var(--danger-hover); border-color: var(--danger-hover); }
+
+/* ---------- ช่องกรอก ---------- */
+html body input[type="text"],
+html body input[type="tel"],
+html body input[type="url"],
+html body input[type="email"],
+html body input[type="password"],
+html body input[type="number"],
+html body select,
+html body .form-control {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+html body input::placeholder,
+html body .form-control::placeholder { color: #8f7f72; }
+html body input:focus,
+html body select:focus,
+html body .form-control:focus {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--brown-light);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(200, 160, 122, 0.25);
+}
+html body input[type="checkbox"] { accent-color: var(--brown); width: auto; }
+
+/* ---------- เฉพาะบางหน้า ---------- */
+/* ตะกร้า */
+html body .totalPrice { color: var(--brown-light); }
+
+/* ตัดสต็อก: บันทึกการตัด */
+html body #logList li { border-bottom: 1px solid var(--border); color: var(--text); }
+
+/* สรุปยอดขาย */
+html body #orderTime { background: var(--surface-2); color: var(--text-muted); }
+html body #totalSoldDisplay,
+html body .total-bar {
+  background: #0b0908;
+  color: #fff;
+  border: 1px solid var(--border);
+  padding: 10px;
+  border-radius: 8px;
+}
+html body .total-bar { color: var(--brown-light); }
+html body .deduction-section label {
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+/* แถบผู้ใช้ + ปุ่มออกจากระบบ (สร้างโดย js/staff-auth.js) */
+html body .staff-bar {
+  position: absolute; /* อยู่มุมขวาบน เลื่อนจอแล้วไม่บังเนื้อหา */
+  top: 10px;
+  right: 10px;
+  z-index: 2000;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #0b0908;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 4px 6px 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+html body .staff-bar button {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--text-muted);
+}
+html body .staff-bar button:hover { background: var(--danger); border-color: var(--danger); }
+
+/* หน้าต่างรายละเอียดออร์เดอร์ (latests.html ใช้ id="joe" กับกล่องและตาราง) */
+html body .modal-body#joe,
+html body table#joe {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* ช่องเลือกรูปสินค้า (latest.html) */
+html body .item-image-name { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+
+/* มือถือ: ตารางสรุปยอดและตัดสต็อกให้ตัวเลขไม่ตกบรรทัด */
+@media (max-width: 600px) {
+  html body { padding: 0 8px 24px; }
+  html body #captureArea,
+  html body .container { padding: 10px; }
+  html body #captureArea table { table-layout: auto; }
+  html body th,
+  html body td { padding: 6px 4px; font-size: 13px; }
+  html body #captureArea td:not(:first-child),
+  html body #captureArea th:not(:first-child) { white-space: nowrap; word-wrap: normal; }
+}

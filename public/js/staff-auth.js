@@ -21,18 +21,21 @@
     window.location.replace("login.html?" + params.toString());
   }
 
+  // แสดงอีเมลแบบย่อ (5 ตัวแรก) ให้ไม่เกะกะ ชี้เมาส์ค้างไว้จะเห็นอีเมลเต็ม
+  function shortName(email) {
+    const name = (email || "staff").split("@")[0];
+    return name.length > 5 ? name.slice(0, 5) + "…" : name;
+  }
+
   function addLogoutButton(user) {
     const bar = document.createElement("div");
-    bar.style.cssText =
-      "position:fixed;top:8px;right:8px;z-index:2000;display:flex;gap:8px;align-items:center;" +
-      "background:rgba(255,255,255,.92);padding:4px 8px;border-radius:8px;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.2)";
+    bar.className = "staff-bar"; // สีและตำแหน่งอยู่ใน css/theme.css
     const who = document.createElement("span");
-    who.textContent = "👤 " + (user.email || "staff");
+    who.textContent = "👤 " + shortName(user.email);
+    who.title = user.email || "";
     const btn = document.createElement("button");
     btn.type = "button";
     btn.textContent = "ออกจากระบบ";
-    btn.className = "btn btn-sm btn-outline-danger";
-    btn.style.cssText = "font-size:12px;padding:2px 8px";
     btn.addEventListener("click", () => firebase.auth().signOut().then(() => goToLogin()));
     bar.append(who, btn);
     document.body.appendChild(bar);
